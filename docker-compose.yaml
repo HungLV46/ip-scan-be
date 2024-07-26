@@ -1,0 +1,32 @@
+version: '3.5'
+
+services:
+  postgres:
+    container_name: postgres
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ip-scan
+      PGDATA: /data/postgres
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - '5432:5432'
+    networks:
+      - local
+    restart: unless-stopped
+
+  redis:
+    image: redis:6.2.2
+    networks:
+      - local
+    ports:
+      - 6379:6379
+
+networks:
+  local:
+    driver: bridge
+
+volumes:
+  postgres:

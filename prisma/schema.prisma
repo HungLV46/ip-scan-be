@@ -1,0 +1,113 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                    Int       @id @default(autoincrement())
+
+  name                  String
+  bio                   String
+  email                 String
+  wallet_address        String
+  avatar_img            String
+  banner_img            String
+  additional_info       Json
+
+  products              Product[]
+
+  @@index(name)
+  @@index(wallet_address)
+  @@map("users")
+}
+
+model Product {
+  id            Int                 @id @default(autoincrement())
+  name          String              
+  category      String
+  description   String
+  avatar_img    String
+  banner_img    String
+  metadata      Json
+  owner_id      Int
+
+  owner         User                @relation(fields: [owner_id], references: [id])
+  collections   Collection[]
+  attributes    ProductAttribute[]
+
+  @@unique(name)
+  @@index(category)
+  @@index(owner_id)
+  @@map("products")
+}
+
+model ProductAttribute {
+  id            Int      @id @default(autoincrement())
+  name          String
+  value         String
+  product_id    Int
+
+  product       Product  @relation(fields: [product_id], references: [id])
+
+  @@unique([name, value, product_id])
+  @@index([name, value])
+  @@index(product_id)
+  @@map("product_attributes")
+}
+
+model Collection {
+  id                Int      @id @default(autoincrement())
+  chain_id          String
+  contract_address  String
+  product_id        Int
+  metadata          Json
+
+  nfts              Nft[]
+  product           Product  @relation(fields: [product_id], references: [id])
+
+  @@unique([chain_id, contract_address])
+  @@index(product_id)
+  @@map("collections")
+}
+
+model Nft {
+  id              Int      @id @default(autoincrement())
+  collection_id   Int
+  token_id        String
+  metadata        Json
+
+  collection      Collection  @relation(fields: [collection_id], references: [id])
+  ipassets        Ipasset[]
+
+  @@unique([collection_id, token_id])
+  @@index(collection_id)
+  @@map("nfts")
+}
+
+model Ipasset {
+  id                  Int         @id @default(autoincrement())
+  chain_id            String
+  contract_address    String
+  token_id            String
+  parent_ipasset_id   Int?
+  nft_id              Int
+  metadata            Json
+
+  nft                 Nft         @relation(fields: [nft_id], references: [id])
+  parent_ipasset      Ipasset?    @relation("ParentChildIpasset", fields: [parent_ipasset_id], references: [id])
+  child_ipassets      Ipasset[]   @relation("ParentChildIpasset")
+
+  @@unique([chain_id, contract_address, token_id])
+  @@index(parent_ipasset_id)
+  @@map("ipassets")
+}

@@ -1,0 +1,69 @@
+{
+  "name": "ip-scan-be",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "HungLV",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "prepare": "husky",
+    "clean": "rm -rf ./dist tsconfig.tsbuildinfo",
+    "compile": "tsc -b",
+    "build": "yarn clean; yarn compile",
+    "start": "node ./dist/index.js",
+    "dev": "yarn start | yarn pino-pretty",
+    "test": "yarn lab -v src/tests/** --typescript",
+    "docker:up": "docker-compose --file docker-compose.yaml up -d",
+    "docker:down": "docker-compose --file docker-compose.yaml down",
+    "db:migrate": "yarn prisma migrate dev",
+    "db:seed": "yarn ts-node ./prisma/seeds/seeds.ts",
+    "db:studio": "yarn prisma studio",
+    "style:format": "yarn prettier . --write",
+    "style:check": "yarn eslint"
+  },
+  "dependencies": {
+    "@bull-board/hapi": "^5.21.1",
+    "@hapi/hapi": "^21.3.10",
+    "@hapi/inert": "^7.1.0",
+    "@hapi/vision": "^7.0.3",
+    "@prisma/client": "^5.17.0",
+    "bullmq": "^5.10.4",
+    "dotenv": "^16.4.5",
+    "hapi-pino": "^12.1.0",
+    "hapi-swagger": "^17.2.1",
+    "install-peerdeps": "^3.0.3",
+    "ioredis": "^5.4.1",
+    "joi": "^17.13.3",
+    "lint-check": "^0.0.2",
+    "pino": "^9.3.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.8.0",
+    "@faker-js/faker": "^8.4.1",
+    "@hapi/code": "^9.0.3",
+    "@hapi/lab": "^25.3.1",
+    "@types/node": "^20.14.12",
+    "eslint": "9.x",
+    "git-format-staged": "^3.1.1",
+    "globals": "^15.8.0",
+    "husky": "^9.1.1",
+    "lint-staged": "^15.2.7",
+    "pino-pretty": "^11.2.2",
+    "prisma": "^5.17.0",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^7.18.0"
+  },
+  "imports": {
+    "#apis/*": "./dist/apis/*.js",
+    "#common/*": "./dist/common/*.js",
+    "#configs/*": "./dist/configs/*.js",
+    "#jobs/*": "./dist/jobs/*.js"
+  },
+  "lint-staged": {
+    "**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
+      "prettier --write"
+    ]
+  }
+}
