@@ -123,8 +123,23 @@ model Ipasset {
   nft                 Nft         @relation(fields: [nft_id], references: [id])
   parent_ipasset      Ipasset?    @relation("ParentChildIpasset", fields: [parent_ipasset_id], references: [id])
   child_ipassets      Ipasset[]   @relation("ParentChildIpasset")
+  licenses            License[]
 
   @@unique([chain_id, contract_address, token_id])
   @@index(parent_ipasset_id)
   @@map("ipassets")
+}
+
+model License {
+  id                  Int         @id @default(autoincrement())
+  chain_id            String
+  contract_address    String
+  token_id            String
+  ipasset_id          Int
+  metadata            Json
+
+  ipasset             Ipasset         @relation(fields: [ipasset_id], references: [id])
+
+  @@unique([chain_id, contract_address, token_id])
+  @@map("licenses")
 }
