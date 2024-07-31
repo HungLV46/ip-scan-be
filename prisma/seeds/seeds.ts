@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { faker } from '@faker-js/faker';
+import * as _ from 'underscore';
 
 const prisma = new PrismaClient();
 
@@ -16,8 +17,9 @@ async function main() {
           avatar_img: faker.image.avatar(),
           banner_img: faker.image.url(),
           additional_info: {
-            twitter: faker.internet.userName(),
-            github: faker.internet.userName(),
+            discord: faker.internet.url(),
+            x: faker.internet.url(),
+            telegram: faker.internet.url(),
           },
         },
       });
@@ -30,13 +32,21 @@ async function main() {
       return prisma.product.create({
         data: {
           name: faker.commerce.productName(),
-          category: faker.commerce.department(),
+          category: faker.helpers.arrayElement([
+            'game',
+            'manga',
+            'anime',
+            'art',
+          ]),
           description: faker.lorem.paragraph(),
           avatar_img: faker.image.url(),
           banner_img: faker.image.url(),
           metadata: {
-            warranty: `${faker.number.int({ min: 1, max: 5 })} years`,
-            brand: faker.company.name(),
+            main_preview: faker.image.url(),
+            other_previews: _.range(
+              0,
+              faker.number.int({ min: 0, max: 6 }),
+            ).map(() => faker.image.url()),
           },
           owner_id: user.id,
         },
@@ -49,22 +59,52 @@ async function main() {
     products.map((product) => {
       return prisma.productAttribute.createMany({
         data: [
-          { name: 'Color', value: faker.color.human(), product_id: product.id },
+          ..._.range(0, faker.number.int({ min: 0, max: 4 })).map(
+            (index: number) => ({
+              name: 'Chain',
+              value: [
+                'Aura network',
+                'Ethereum',
+                'Arbitrum One',
+                'Avalanche C-Chain',
+                'Blast',
+              ][index],
+              product_id: product.id,
+            }),
+          ),
           {
-            name: 'Size',
-            value: faker.commerce.productAdjective(),
+            name: 'Game status',
+            value: faker.helpers.arrayElement([
+              'Prototype',
+              'Alpha',
+              'Beta',
+              'Final Product',
+            ]),
             product_id: product.id,
           },
-          {
-            name: 'Material',
-            value: faker.commerce.productMaterial(),
-            product_id: product.id,
-          },
-          {
-            name: 'Weight',
-            value: `${faker.number.int({ min: 1, max: 100 })}kg`,
-            product_id: product.id,
-          },
+          ..._.range(0, faker.number.int({ min: 0, max: 2 })).map(
+            (index: number) => ({
+              name: 'Player info',
+              value: ['Singleplayer', 'Multiplayer', 'Massive Multiplayer'][
+                index
+              ],
+              product_id: product.id,
+            }),
+          ),
+          ..._.range(0, faker.number.int({ min: 0, max: 3 })).map(
+            (index: number) => ({
+              name: 'Genre',
+              value: ['Action', 'Romance', 'Survival', 'Telltale'][index],
+              product_id: product.id,
+            }),
+          ),
+          ..._.range(0, faker.number.int({ min: 0, max: 2 })).map(
+            (index: number) => ({
+              name: 'Game mode',
+              value: ['PvE', 'PvP', 'Cooperative'][index],
+              product_id: product.id,
+            }),
+          ),
         ],
       });
     }),

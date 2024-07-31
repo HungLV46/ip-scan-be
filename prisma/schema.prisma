@@ -32,14 +32,30 @@ model User {
 }
 
 model Product {
-  id            Int                 @id @default(autoincrement())
-  name          String              
-  category      String
-  description   String
-  avatar_img    String
-  banner_img    String
-  metadata      Json
-  owner_id      Int
+  id                      Int                 @id @default(autoincrement())
+  name                    String              
+  category                String
+  description             String
+  avatar_img              String
+  banner_img              String
+  metadata                Json
+  owner_id                Int
+  featured_at             DateTime?
+  created_at              DateTime            @default(now())
+
+  stat_total_collection   Int?              
+  stat_total_items        Int?
+  stat_total_activities   BigInt?
+
+  stat_total_volume_all   BigInt?
+  stat_total_volume_12m   BigInt?
+  stat_total_volume_30d   BigInt?
+  stat_total_volume_7d    BigInt?
+
+  stat_floor_price_all    BigInt?
+  stat_floor_price_12m    BigInt?
+  stat_floor_price_30d    BigInt?
+  stat_floor_price_7d     BigInt?
 
   owner         User                @relation(fields: [owner_id], references: [id])
   collections   Collection[]
@@ -48,6 +64,7 @@ model Product {
   @@unique(name)
   @@index(category)
   @@index(owner_id)
+  @@index(created_at)
   @@map("products")
 }
 

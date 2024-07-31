@@ -22,6 +22,19 @@ CREATE TABLE "products" (
     "banner_img" TEXT NOT NULL,
     "metadata" JSONB NOT NULL,
     "owner_id" INTEGER NOT NULL,
+    "featured_at" TIMESTAMP(3),
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "stat_total_collection" INTEGER,
+    "stat_total_items" INTEGER,
+    "stat_total_activities" BIGINT,
+    "stat_total_volume_all" BIGINT,
+    "stat_total_volume_12m" BIGINT,
+    "stat_total_volume_30d" BIGINT,
+    "stat_total_volume_7d" BIGINT,
+    "stat_floor_price_all" BIGINT,
+    "stat_floor_price_12m" BIGINT,
+    "stat_floor_price_30d" BIGINT,
+    "stat_floor_price_7d" BIGINT,
 
     CONSTRAINT "products_pkey" PRIMARY KEY ("id")
 );
@@ -81,6 +94,9 @@ CREATE INDEX "products_category_idx" ON "products"("category");
 
 -- CreateIndex
 CREATE INDEX "products_owner_id_idx" ON "products"("owner_id");
+
+-- CreateIndex
+CREATE INDEX "products_created_at_idx" ON "products"("created_at");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "products_name_key" ON "products"("name");
