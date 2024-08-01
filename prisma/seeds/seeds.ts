@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 import * as _ from 'underscore';
+import ipassetsData from './ipassets.json';
 
 const prisma = new PrismaClient();
 
@@ -110,13 +111,18 @@ async function main() {
     }),
   );
 
+  const collectionAddressToIpassets = _.groupBy(
+    ipassetsData,
+    (ipasset) => ipasset.nftMetadata.tokenContract,
+  );
+  const collectionAddresses = Object.keys(collectionAddressToIpassets);
   // Create Collections
   const collections = await Promise.all(
-    products.map((product) => {
+    products.map((product, index: number) => {
       return prisma.collection.create({
         data: {
-          chain_id: faker.string.uuid(),
-          contract_address: faker.finance.ethereumAddress(),
+          chain_id: '11155111',
+          contract_address: collectionAddresses[index],
           product_id: product.id,
           metadata: {
             rarity: faker.helpers.arrayElement(['common', 'rare', 'epic']),
@@ -129,30 +135,48 @@ async function main() {
 
   // Create NFTs
   const nfts = await Promise.all(
-    collections.map((collection) => {
-      return prisma.nft.create({
-        data: {
-          collection_id: collection.id,
-          token_id: faker.string.uuid(),
-          metadata: {
-            attribute: faker.word.sample(),
-          },
-        },
-      });
-    }),
+    collections
+      .map((collection) => {
+        const nftData = collectionAddressToIpassets[
+          collection.contract_address
+        ].map((ipasset) => ipasset.nftMetadata);
+        return nftData.map((nft) =>
+          prisma.nft.create({
+            data: {
+              collection_id: collection.id,
+              chain_id: collection.chain_id,
+              contract_address: collection.contract_address,
+              token_id: nft.tokenId,
+              metadata: {
+                attribute: faker.word.sample(),
+              },
+            },
+          }),
+        );
+      })
+      .flat(),
   );
 
+  const generateKey = (address: string, id: string) => address + '|' + id;
+  const tokenKeyToIpassets = _.groupBy(ipassetsData, (ipasset) =>
+    generateKey(ipasset.nftMetadata.tokenContract, ipasset.nftMetadata.tokenId),
+  );
   // Create IPAssets
   await Promise.all(
     nfts.map((nft) => {
       return prisma.ipasset.createMany({
         data: [
           {
-            chain_id: faker.string.uuid(),
-            contract_address: faker.finance.ethereumAddress(),
-            token_id: faker.string.uuid(),
+            chain_id: '11155111',
+            contract_address:
+              tokenKeyToIpassets[
+                generateKey(nft.contract_address, nft.token_id)
+              ][0].id,
             nft_id: nft.id,
-            metadata: { attr: faker.word.sample() },
+            metadata:
+              tokenKeyToIpassets[
+                generateKey(nft.contract_address, nft.token_id)
+              ][0].nftMetadata,
           },
         ],
       });

@@ -99,15 +99,18 @@ model Collection {
 }
 
 model Nft {
-  id              Int      @id @default(autoincrement())
-  collection_id   Int
-  token_id        String
-  metadata        Json
+  id                Int      @id @default(autoincrement())
+  chain_id          String
+  collection_id     Int
+  contract_address  String
+  token_id          String
+  metadata          Json
 
-  collection      Collection  @relation(fields: [collection_id], references: [id])
-  ipassets        Ipasset[]
+  collection        Collection  @relation(fields: [collection_id], references: [id])
+  ipassets          Ipasset[]
 
   @@unique([collection_id, token_id])
+  @@unique([chain_id, contract_address, token_id])
   @@index(collection_id)
   @@map("nfts")
 }
@@ -116,17 +119,16 @@ model Ipasset {
   id                  Int         @id @default(autoincrement())
   chain_id            String
   contract_address    String
-  token_id            String
   parent_ipasset_id   Int?
   nft_id              Int
   metadata            Json
 
   nft                 Nft         @relation(fields: [nft_id], references: [id])
-  parent_ipasset      Ipasset?    @relation("ParentChildIpasset", fields: [parent_ipasset_id], references: [id])
+  parent_ipassets     Ipasset?    @relation("ParentChildIpasset", fields: [parent_ipasset_id], references: [id])
   child_ipassets      Ipasset[]   @relation("ParentChildIpasset")
   licenses            License[]
 
-  @@unique([chain_id, contract_address, token_id])
+  @@unique([chain_id, contract_address])
   @@index(parent_ipasset_id)
   @@map("ipassets")
 }
