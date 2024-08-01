@@ -14,4 +14,4 @@ WORKDIR /ip-scan-be
 ADD . /ip-scan-be
 
 # Command to run the application
-CMD ["yarn", "start"]
+ENTRYPOINT ["./entrypoint.sh"]
