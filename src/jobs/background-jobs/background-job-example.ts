@@ -34,5 +34,3 @@ const worker = new Worker(
 worker.on('error', (err) => {
   console.error(err);
 });
-
-addToQueue();
