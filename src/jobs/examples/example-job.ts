@@ -19,7 +19,7 @@ export const queue = new Queue(QUEUE_NAME, {
 });
 
 export async function addToQueue(data: { id: number }) {
-  await queue.add(randomUUID(), { id: data.id }, { repeat: { every: 5000 } });
+  await queue.add(randomUUID(), { id: data.id });
 }
 
 const worker = new Worker(
