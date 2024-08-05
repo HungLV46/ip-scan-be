@@ -7,4 +7,8 @@ export const config = {
   redisUrl: String(process.env.REDIS_URL || 'localhost:6379'),
 
   logLevel: String(process.env.LOG_LEVEL || 'info'),
+
+  // Elasticsearch
+  elasticsearchUrl: String(process.env.ELASTICSEARCH_URL || ''),
+  doElasticsearchWork: Boolean(Number(process.env.DO_ELASTICSEARCH_WORK)),
 };
