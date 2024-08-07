@@ -13,14 +13,16 @@ export interface BaseDocument {
 
 export interface BuildDocumentData {
   id: string;
+  chain_id?: number;
 }
 
 export abstract class DocumentBuilder {
   public buildDocument(data: BuildDocumentData): BaseDocument {
+    const chainId = data.chain_id ?? config.chainId;
     return {
       chain: {
-        id: config.chainId,
-        name: getNetworkName(),
+        id: chainId,
+        name: getNetworkName(chainId),
       },
       id: data.id,
       indexed_at: new Date(),
