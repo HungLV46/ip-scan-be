@@ -1,7 +1,5 @@
-import { config } from '#configs/index';
-
-export const getNetworkName = () => {
-  switch (config.chainId) {
+export const getNetworkName = (chainId: number) => {
+  switch (chainId) {
     case 1:
       return 'mainnet';
 

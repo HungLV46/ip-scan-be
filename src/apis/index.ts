@@ -12,6 +12,8 @@ import { config } from '#configs/index';
 import { loggerSetting, logger } from '#common/loggger';
 import * as routes from './routes';
 import { getAllQueues } from '#jobs/index';
+import * as elasticSearchJob from '#jobs/elastic-search/elastic-search-job';
+import { initIndexes } from 'elastic-search/indexes';
 
 async function registerPlugins(server: Hapi.Server): Promise<void> {
   // log
@@ -58,6 +60,10 @@ async function registerAdapters(server: Hapi.Server) {
   });
 }
 
+async function registerJobs() {
+  await elasticSearchJob.addToQueue();
+}
+
 async function initServer(): Promise<void> {
   const server: Hapi.Server = Hapi.server({
     port: config.port,
@@ -67,6 +73,9 @@ async function initServer(): Promise<void> {
 
   await registerPlugins(server);
   await registerAdapters(server);
+  await initIndexes();
+  await registerJobs();
+
   routeApis(server);
 
   await server.start();
