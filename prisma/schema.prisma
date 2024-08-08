@@ -43,7 +43,7 @@ model Product {
   owner_id                Int
   featured_at             DateTime?
   created_at              DateTime            @default(now())
-  updated_at              DateTime            @default(now())
+  updated_at              DateTime            @updatedAt
 
   stat_total_collection   Int?              
   stat_total_items        Int?
@@ -94,7 +94,9 @@ model Collection {
 
   nfts              Nft[]
   product           Product  @relation(fields: [product_id], references: [id])
-
+  created_at              DateTime            @default(now())
+  updated_at              DateTime            @updatedAt
+  
   @@unique([chain_id, contract_address])
   @@index(product_id)
   @@index(name)
