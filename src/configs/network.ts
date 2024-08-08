@@ -1,48 +1,89 @@
-export const getNetworkName = (chainId: number) => {
-  switch (chainId) {
-    case 1:
-      return 'mainnet';
+import { defineChain } from 'viem';
 
-    case 5:
-      return 'goerli';
+export const aura_testnet = defineChain({
+  id: 1235,
+  name: 'Aura EVM Devnet',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'test-Aura',
+    symbol: 'tAURA',
+  },
+  testnet: true,
+  rpcUrls: {
+    default: {
+      http: ['https://rpc.dev.aura.network'],
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: 'Testnet',
+      url: 'https://explorer.dev.aura.network/',
+    },
+  },
+});
 
-    case 10:
-      return 'optimism';
+export const aura_serenity = defineChain({
+  id: 1236,
+  name: 'Aura EVM Serenity',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'test-Aura',
+    symbol: 'AURA',
+  },
+  testnet: true,
+  rpcUrls: {
+    default: {
+      http: ['https://rpc.serenity.aura.network'],
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: 'Serenity Testnet',
+      url: 'https://serenity.aurascan.io/',
+    },
+  },
+});
 
-    case 56:
-      return 'bsc';
+export const aura_euphoria = defineChain({
+  id: 6321,
+  name: 'Aura EVM Euphoria',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'test-EAura',
+    symbol: 'eAURA',
+  },
+  testnet: true,
+  rpcUrls: {
+    default: {
+      http: ['https://rpc.euphoria.aura.network'],
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: 'Euphoria Testnet',
+      url: 'https://euphoria.aurascan.io/',
+    },
+  },
+});
 
-    case 137:
-      return 'polygon';
-
-    case 42161:
-      return 'arbitrum';
-
-    case 11155111:
-      return 'sepolia';
-
-    case 8453:
-      return 'base';
-
-    case 28122024:
-      return 'ancient8-testnet';
-
-    case 888888888:
-      return 'ancient8';
-
-    case 84532:
-      return 'base-sepolia';
-
-    case 1236:
-      return 'aura-serenity';
-
-    case 6321:
-      return 'aura-euphoria';
-
-    case 6222:
-      return 'aura-xstasy-1';
-
-    default:
-      return 'unknown';
-  }
-};
+export const aura_mainnet = defineChain({
+  id: 6322,
+  name: 'Aura EVM Mainnet',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'Aura',
+    symbol: 'AURA',
+  },
+  testnet: true,
+  rpcUrls: {
+    default: {
+      http: ['https://rpc.aura.network'],
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: 'Aura Explorer (Aurascan)',
+      url: 'https://aurascan.io/',
+    },
+  },
+});

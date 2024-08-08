@@ -11,9 +11,17 @@ export interface ProductDocument extends BaseDocument {
   metadata: JSON;
   owner: string;
   featured_at: Date;
-  created_at: Date;
+  updated_at: Date;
 
+  collections: CollectionDocument[];
   attributes: ProductAttributeDocument[];
+}
+
+interface CollectionDocument {
+  id: number;
+  name: string;
+  chain_id: number;
+  contract_address: string;
 }
 
 interface ProductAttributeDocument {
@@ -33,8 +41,9 @@ export interface BuildProductDocumentData extends BuildDocumentData {
   metadata: JSON;
   owner: string;
   featured_at: Date;
-  created_at: Date;
+  updated_at: Date;
 
+  collections: CollectionDocument[];
   attributes: ProductAttributeDocument[];
 }
 
