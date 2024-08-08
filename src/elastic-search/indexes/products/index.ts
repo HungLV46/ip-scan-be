@@ -134,21 +134,22 @@ export const getAllData = async (): Promise<ProductDocument[]> => {
   return results;
 };
 
-export const syncDataMissing = async (): Promise<void> => {
+export const syncDataMissing = async (upsert = true): Promise<void> => {
   try {
-    const productIds = (await getAllData()).map((data) => data.product_id);
+    const updatedAts = (await getAllData()).map((data) => data.updated_at);
     console.log(
       'syncDataMissing-product indexed: ',
-      JSON.stringify(productIds),
+      JSON.stringify(updatedAts),
     );
     const postgresData = await prisma.product.findMany({
       where: {
-        id: {
-          notIn: productIds,
+        created_at: {
+          gt: new Date(),
         },
       },
       include: {
         owner: true,
+        collections: true,
         attributes: true,
       },
     });
@@ -168,7 +169,12 @@ export const syncDataMissing = async (): Promise<void> => {
 
     await elasticsearch.bulk({
       body: documents.flatMap((document) => [
-        { ['create']: { _index: INDEX_NAME, _id: document.id } },
+        {
+          [upsert ? 'index' : 'create']: {
+            _index: INDEX_NAME,
+            _id: document.id,
+          },
+        },
         document,
       ]),
     });
