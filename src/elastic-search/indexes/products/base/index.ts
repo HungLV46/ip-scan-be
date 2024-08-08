@@ -51,9 +51,9 @@ export class ProductDocumentBuilder extends DocumentBuilder {
       return document;
     } catch (error) {
       console.error(
-        'CollectionDocumentBuilder',
+        'ProductDocumentBuilder',
         JSON.stringify({
-          message: `buildDocument Error. product id = ${data.id}, error=${error}`,
+          message: `buildDocument Error. product id = ${data.product_id}, error=${error}`,
           data,
           error,
         }),
