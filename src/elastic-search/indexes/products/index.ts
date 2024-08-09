@@ -15,11 +15,18 @@ export const save = async (
 ): Promise<void> => {
   try {
     const document = new ProductDocumentBuilder().buildDocument(data);
-    const response = await elasticsearch.create({
-      index: INDEX_NAME,
-      id: document.id,
-      document,
+    const response = await elasticsearch.bulk({
+      body: [
+        {
+          [upsert ? 'index' : 'create']: {
+            _index: INDEX_NAME,
+            _id: document.id,
+          },
+        },
+        document,
+      ],
     });
+
     console.log('elasticsearch-products', JSON.stringify(response));
   } catch (error) {
     console.error(
@@ -126,27 +133,43 @@ export const query = async (params: {
   return { esResult };
 };
 
-export const getAllData = async (): Promise<ProductDocument[]> => {
-  const esResult = await elasticsearch.search<any>({
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const _getAllData = async (): Promise<ProductDocument[]> => {
+  const esResult = await elasticsearch.search<ProductDocument>({
     index: INDEX_NAME,
   });
   const results = esResult.hits.hits.map((hit) => hit._source!);
   return results;
 };
 
-export const syncDataMissing = async (upsert = true): Promise<void> => {
-  try {
-    const updatedAts = (await getAllData()).map((data) => data.updated_at);
-    console.log(
-      'syncDataMissing-product indexed: ',
-      JSON.stringify(updatedAts),
-    );
-    const postgresData = await prisma.product.findMany({
-      where: {
-        created_at: {
-          gt: new Date(),
+const getDataByProductId = async (
+  productId: number,
+): Promise<ProductDocument | null> => {
+  const query = {
+    bool: {
+      must: [
+        {
+          term: { product_id: productId },
         },
-      },
+      ],
+    },
+  };
+  const esResult = await elasticsearch.search<ProductDocument>({
+    index: INDEX_NAME,
+    query,
+    size: 1,
+  });
+
+  const results = esResult.hits.hits.map((hit) => hit._source!);
+  if (results.length === 0) {
+    return null;
+  }
+  return results[0];
+};
+
+export const syncDataMissing = async (): Promise<void> => {
+  try {
+    const postgresData = await prisma.product.findMany({
       include: {
         owner: true,
         collections: true,
@@ -159,25 +182,32 @@ export const syncDataMissing = async (upsert = true): Promise<void> => {
       JSON.stringify(postgresData.length),
     );
 
-    if (postgresData.length === 0) {
-      return;
+    for (const data of postgresData) {
+      const elasticData = await getDataByProductId(data.id);
+      let upsert = false;
+      if (!elasticData) {
+        upsert = false;
+      } else {
+        console.log(
+          `syncDataMissing product id: ${JSON.stringify(data.updated_at)} with elasticData: ${elasticData.updated_at}`,
+        );
+        // check if updated_at is newer
+        if (new Date(data.updated_at) > new Date(elasticData.updated_at)) {
+          console.log(`New update found for product id: ${data.id}`);
+          data.id = elasticData.id;
+          upsert = true;
+        } else {
+          continue;
+        }
+      }
+
+      const document = productToProductDocumentData(data);
+      await save(document, upsert);
+
+      console.log(
+        `syncDataMissing product id: ${JSON.stringify(data.id)} with upsert: ${upsert}`,
+      );
     }
-
-    const documents = postgresData
-      .map((data) => productToProductDocumentData(data))
-      .map((data) => new ProductDocumentBuilder().buildDocument(data));
-
-    await elasticsearch.bulk({
-      body: documents.flatMap((document) => [
-        {
-          [upsert ? 'index' : 'create']: {
-            _index: INDEX_NAME,
-            _id: document.id,
-          },
-        },
-        document,
-      ]),
-    });
   } catch (error) {
     console.error(
       'elasticsearch-products',

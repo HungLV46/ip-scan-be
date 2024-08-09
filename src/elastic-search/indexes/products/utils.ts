@@ -4,14 +4,15 @@ export const productToProductDocumentData = (
   product: any,
 ): BuildProductDocumentData => {
   const document = {
+    id: product.id,
     product_id: product.id,
-    name: product.owner.name,
+    name: product.name,
     category: product.category,
     description: product.description,
     avatar_img: product.avatar_img,
     banner_img: product.banner_img,
     metadata: product.metadata,
-    owner: product.owner,
+    owner: product.owner.name,
     featured_at: product.featured_at,
     updated_at: product.updated_at,
 
