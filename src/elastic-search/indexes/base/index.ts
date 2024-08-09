@@ -1,11 +1,11 @@
 export interface BaseDocument {
-  id: string;
+  id: number;
   indexed_at: Date;
   created_at: Date;
 }
 
 export interface BuildDocumentData {
-  id: string;
+  id: number;
 }
 
 export abstract class DocumentBuilder {
