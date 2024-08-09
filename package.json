@@ -17,6 +17,7 @@
     "docker:down": "docker compose --file docker-compose.yaml down",
     "db:generate": "yarn prisma generate",
     "db:migrate": "yarn prisma migrate deploy",
+    "db:migrate-new": "npx prisma migrate dev --create-only",
     "db:migrate-dev": "yarn prisma migrate dev",
     "db:seed": "yarn ts-node ./prisma/seeds/seeds.ts",
     "db:studio": "yarn prisma studio",
