@@ -1,5 +1,6 @@
 import { prisma } from '#common/db';
 import { elasticsearch } from '#common/elastic-search';
+import { getLastIndexedTime, setLastIndexedTime } from '#common/redis';
 import {
   BuildProductDocumentData,
   ProductDocument,
@@ -169,7 +170,14 @@ const getDataByProductId = async (
 
 export const syncDataMissing = async (): Promise<void> => {
   try {
+    const lastIndexedTime = await getLastIndexedTime();
+
     const postgresData = await prisma.product.findMany({
+      where: {
+        updated_at: {
+          gt: new Date(lastIndexedTime),
+        },
+      },
       include: {
         owner: true,
         collections: true,
@@ -191,18 +199,16 @@ export const syncDataMissing = async (): Promise<void> => {
         console.log(
           `syncDataMissing product id: ${JSON.stringify(data.updated_at)} with elasticData: ${elasticData.updated_at}`,
         );
-        // check if updated_at is newer
-        if (new Date(data.updated_at) > new Date(elasticData.updated_at)) {
-          console.log(`New update found for product id: ${data.id}`);
-          data.id = elasticData.id;
-          upsert = true;
-        } else {
-          continue;
-        }
+        upsert = true;
       }
 
       const document = productToProductDocumentData(data);
       await save(document, upsert);
+
+      // update last indexed time
+      if (lastIndexedTime < data.updated_at.getTime()) {
+        await setLastIndexedTime(data.updated_at.getTime());
+      }
 
       console.log(
         `syncDataMissing product id: ${JSON.stringify(data.id)} with upsert: ${upsert}`,
