@@ -17,6 +17,28 @@ curl -X GET 'http://localhost:9200/products/_search?pretty' -H 'Content-Type: ap
     }
 }'
 
+curl -X GET 'http://localhost:9200/products/_search?pretty' -H 'Content-Type: application/json' -d '{
+    "query" : { 
+        "bool": {
+            "should": [
+                {
+                    "term": { "name": "Oriental" }
+                }
+            ]
+        }
+    }
+}'
+
+curl -X GET 'http://localhost:9200/products/_search?pretty' -H 'Content-Type: application/json' -d '{
+    "query" : { 
+        "bool": {
+            "filter": [
+                { "term": { "category": "game" }}
+            ]
+        }
+    }
+}'
+
 # Delete all documents
 curl \
  -X POST http://localhost:9200/products/_delete_by_query \
