@@ -15,7 +15,13 @@ export const save = async (
   upsert = true,
 ): Promise<void> => {
   try {
-    const document = new ProductDocumentBuilder().buildDocument(data);
+    let document: ProductDocument;
+    if (upsert) {
+      document = data as ProductDocument;
+      document.indexed_at = new Date();
+    } else {
+      document = new ProductDocumentBuilder().buildDocument(data);
+    }
     const response = await elasticsearch.bulk({
       body: [
         {
@@ -199,6 +205,7 @@ export const syncDataMissing = async (): Promise<void> => {
         console.log(
           `syncDataMissing product id: ${JSON.stringify(data.updated_at)} with elasticData: ${elasticData.updated_at}`,
         );
+        data.created_at = elasticData.created_at;
         upsert = true;
       }
 
