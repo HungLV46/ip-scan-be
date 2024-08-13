@@ -39,6 +39,18 @@ curl -X GET 'http://localhost:9200/products/_search?pretty' -H 'Content-Type: ap
     }
 }'
 
+curl -X GET 'http://localhost:9200/products/_search?pretty' -H 'Content-Type: application/json' -d '{
+    "query" : { 
+        "bool": {
+            "filter": [
+                { "term": { "collections.id": "2" }},
+                { "term": { "collections.chain_id": "11155111" }},
+                { "term": { "attributes.value": "Ethereum" }}
+            ]
+        }
+    }
+}'
+
 # Delete all documents
 curl \
  -X POST http://localhost:9200/products/_delete_by_query \
@@ -48,3 +60,5 @@ curl \
             "match_all" : {}
     }
  }'
+
+ curl -X DELETE "http://localhost:9200/products-1723004571946"

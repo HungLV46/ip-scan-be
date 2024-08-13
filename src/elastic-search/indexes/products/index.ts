@@ -185,9 +185,27 @@ export const syncDataMissing = async (): Promise<void> => {
         },
       },
       include: {
-        owner: true,
-        collections: true,
-        attributes: true,
+        owner: {
+          select: {
+            id: true,
+            name: true,
+            bio: true,
+            email: true,
+            wallet_address: true,
+            avatar_img: true,
+            banner_img: true,
+            additional_info: true,
+          },
+        },
+        collections: {
+          select: {
+            id: true,
+            name: true,
+            chain_id: true,
+            contract_address: true,
+          },
+        },
+        attributes: { select: { id: true, name: true, value: true } },
       },
     });
 
