@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
@@ -15,17 +15,17 @@ datasource db {
 }
 
 model User {
-  id                    Int       @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-  name                  String
-  bio                   String
-  email                 String
-  wallet_address        String
-  avatar_img            String
-  banner_img            String
-  additional_info       Json
+  name            String
+  bio             String
+  email           String
+  wallet_address  String
+  avatar_img      String
+  banner_img      String
+  additional_info Json?
 
-  products              Product[]
+  products Product[]
 
   @@index(name)
   @@index(wallet_address)
@@ -33,35 +33,35 @@ model User {
 }
 
 model Product {
-  id                      Int                 @id @default(autoincrement())
-  name                    String              
-  category                String
-  description             String
-  avatar_img              String
-  banner_img              String
-  metadata                Json
-  owner_id                Int
-  featured_at             DateTime?
-  created_at              DateTime            @default(now())
-  updated_at              DateTime            @default(now()) @updatedAt
+  id          Int       @id @default(autoincrement())
+  name        String
+  category    String
+  description String
+  avatar_img  String
+  banner_img  String
+  metadata    Json
+  owner_id    Int
+  featured_at DateTime?
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @default(now()) @updatedAt
 
-  stat_total_collection   Int?              
-  stat_total_items        Int?
-  stat_total_activities   BigInt?
+  stat_total_collection Int?
+  stat_total_items      Int?
+  stat_total_activities BigInt?
 
-  stat_total_volume_all   BigInt?
-  stat_total_volume_12m   BigInt?
-  stat_total_volume_30d   BigInt?
-  stat_total_volume_7d    BigInt?
+  stat_total_volume_all BigInt?
+  stat_total_volume_12m BigInt?
+  stat_total_volume_30d BigInt?
+  stat_total_volume_7d  BigInt?
 
-  stat_floor_price_all    BigInt?
-  stat_floor_price_12m    BigInt?
-  stat_floor_price_30d    BigInt?
-  stat_floor_price_7d     BigInt?
+  stat_floor_price_all BigInt?
+  stat_floor_price_12m BigInt?
+  stat_floor_price_30d BigInt?
+  stat_floor_price_7d  BigInt?
 
-  owner         User                @relation(fields: [owner_id], references: [id])
-  collections   Collection[]
-  attributes    ProductAttribute[]
+  owner               User                @relation(fields: [owner_id], references: [id])
+  attributes          ProductAttribute[]
+  product_collections ProductCollection[]
 
   @@unique(name)
   @@index(category)
@@ -71,12 +71,12 @@ model Product {
 }
 
 model ProductAttribute {
-  id            Int      @id @default(autoincrement())
-  name          String
-  value         String
-  product_id    Int
+  id         Int    @id @default(autoincrement())
+  name       String
+  value      String
+  product_id Int
 
-  product       Product  @relation(fields: [product_id], references: [id])
+  product Product @relation(fields: [product_id], references: [id])
 
   @@unique([name, value, product_id])
   @@index([name, value])
@@ -85,34 +85,45 @@ model ProductAttribute {
 }
 
 model Collection {
-  id                Int      @id @default(autoincrement())
-  name              String?
-  chain_id          String
-  contract_address  String
-  product_id        Int
-  metadata          Json
+  id               Int     @id @default(autoincrement())
+  name             String?
+  chain_id         String
+  contract_address String
+  metadata         Json
 
-  nfts              Nft[]
-  product           Product  @relation(fields: [product_id], references: [id])
-  created_at              DateTime            @default(now())
-  updated_at              DateTime            @default(now()) @updatedAt
-  
+  nfts                Nft[]
+  product_collections ProductCollection[]
+  created_at          DateTime            @default(now())
+  updated_at          DateTime            @default(now()) @updatedAt
+
   @@unique([chain_id, contract_address])
-  @@index(product_id)
   @@index(name)
   @@map("collections")
 }
 
-model Nft {
-  id                Int      @id @default(autoincrement())
-  chain_id          String
-  collection_id     Int
-  contract_address  String
-  token_id          String
-  metadata          Json
+model ProductCollection {
+  id            Int @id @default(autoincrement())
+  product_id    Int
+  collection_id Int
 
-  collection        Collection  @relation(fields: [collection_id], references: [id])
-  ipassets          Ipasset[]
+  product    Product    @relation(fields: [product_id], references: [id])
+  collection Collection @relation(fields: [collection_id], references: [id])
+
+  @@index([product_id])
+  @@index([collection_id])
+  @@map("product_collections")
+}
+
+model Nft {
+  id               Int    @id @default(autoincrement())
+  chain_id         String
+  collection_id    Int
+  contract_address String
+  token_id         String
+  metadata         Json?
+
+  collection Collection @relation(fields: [collection_id], references: [id])
+  ipassets   Ipasset[]
 
   @@unique([collection_id, token_id])
   @@unique([chain_id, contract_address, token_id])
@@ -121,17 +132,17 @@ model Nft {
 }
 
 model Ipasset {
-  id                  Int         @id @default(autoincrement())
-  chain_id            String
-  contract_address    String
-  parent_ipasset_id   Int?
-  nft_id              Int
-  metadata            Json
+  id                Int    @id @default(autoincrement())
+  chain_id          String
+  contract_address  String
+  parent_ipasset_id Int?
+  nft_id            Int
+  metadata          Json?
 
-  nft                 Nft         @relation(fields: [nft_id], references: [id])
-  parent_ipassets     Ipasset?    @relation("ParentChildIpasset", fields: [parent_ipasset_id], references: [id])
-  child_ipassets      Ipasset[]   @relation("ParentChildIpasset")
-  licenses            License[]
+  nft             Nft       @relation(fields: [nft_id], references: [id])
+  parent_ipassets Ipasset?  @relation("ParentChildIpasset", fields: [parent_ipasset_id], references: [id])
+  child_ipassets  Ipasset[] @relation("ParentChildIpasset")
+  licenses        License[]
 
   @@unique([chain_id, contract_address])
   @@index(parent_ipasset_id)
@@ -139,14 +150,14 @@ model Ipasset {
 }
 
 model License {
-  id                  Int         @id @default(autoincrement())
-  chain_id            String
-  contract_address    String
-  token_id            String
-  ipasset_id          Int
-  metadata            Json
+  id               Int    @id @default(autoincrement())
+  chain_id         String
+  contract_address String
+  token_id         String
+  ipasset_id       Int
+  metadata         Json?
 
-  ipasset             Ipasset         @relation(fields: [ipasset_id], references: [id])
+  ipasset Ipasset @relation(fields: [ipasset_id], references: [id])
 
   @@unique([chain_id, contract_address, token_id])
   @@map("licenses")

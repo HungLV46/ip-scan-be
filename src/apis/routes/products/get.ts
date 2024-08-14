@@ -1,11 +1,10 @@
 import Hapi from '@hapi/hapi';
 import { prisma } from '#common/db';
 import Joi from 'joi';
-import { addToQueue } from '#jobs/examples/example-job';
 
 export const getProductionRoute: Hapi.ServerRoute = {
   method: 'GET',
-  path: '/productions/{id}',
+  path: '/products/{id}',
   options: {
     description: 'Get product by its ID',
     notes: 'Just an example demonstrating how to set up an API.',
@@ -26,7 +25,6 @@ export const getProductionRoute: Hapi.ServerRoute = {
     // response: { schema: Joi.object({}) }
   },
   handler: (request: Hapi.Request) => {
-    addToQueue({ id: Date.now() });
     return prisma.product.findFirst(request.params.id);
   },
 };
