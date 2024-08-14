@@ -42,18 +42,18 @@ services:
     ports:
       - 9200:9200
 
-  be:
-    image: ipscanbe
-    depends_on:
-      postgres:
-        condition: service_healthy
-    ports:
-      - '3000:3000'
-    environment:
-      REDIS_URL: redis://redis:6379/1
-      DATABASE_URL: 'postgresql://postgres:password@postgres:5432/ip-scan?schema=public'
-    networks:
-      - local
+#   be:
+#     image: ipscanbe
+#     depends_on:
+#       postgres:
+#         condition: service_healthy
+#     ports:
+#       - '3000:3000'
+#     environment:
+#       REDIS_URL: redis://redis:6379/1
+#       DATABASE_URL: 'postgresql://postgres:password@postgres:5432/ip-scan?schema=public'
+#     networks:
+#       - local
 
 networks:
   local:

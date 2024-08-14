@@ -62,30 +62,14 @@ async function main() {
         data: [
           ..._.range(0, faker.number.int({ min: 0, max: 4 })).map(
             (index: number) => ({
-              name: 'Chain',
-              value: [
-                'Aura network',
-                'Ethereum',
-                'Arbitrum One',
-                'Avalanche C-Chain',
-                'Blast',
-              ][index],
+              name: 'status',
+              value: ['Prototype', 'Alpha', 'Beta', 'Final Product'][index],
               product_id: product.id,
             }),
           ),
-          {
-            name: 'Game status',
-            value: faker.helpers.arrayElement([
-              'Prototype',
-              'Alpha',
-              'Beta',
-              'Final Product',
-            ]),
-            product_id: product.id,
-          },
           ..._.range(0, faker.number.int({ min: 0, max: 2 })).map(
             (index: number) => ({
-              name: 'Player info',
+              name: 'player info',
               value: ['Singleplayer', 'Multiplayer', 'Massive Multiplayer'][
                 index
               ],
@@ -94,14 +78,14 @@ async function main() {
           ),
           ..._.range(0, faker.number.int({ min: 0, max: 3 })).map(
             (index: number) => ({
-              name: 'Genre',
+              name: 'genre',
               value: ['Action', 'Romance', 'Survival', 'Telltale'][index],
               product_id: product.id,
             }),
           ),
           ..._.range(0, faker.number.int({ min: 0, max: 2 })).map(
             (index: number) => ({
-              name: 'Game mode',
+              name: 'game mode',
               value: ['PvE', 'PvP', 'Cooperative'][index],
               product_id: product.id,
             }),
@@ -118,18 +102,28 @@ async function main() {
   const collectionAddresses = Object.keys(collectionAddressToIpassets);
   // Create Collections
   const collections = await Promise.all(
-    products.map((product, index: number) => {
-      return prisma.collection.create({
-        data: {
-          chain_id: '11155111',
-          contract_address: collectionAddresses[index],
-          product_id: product.id,
-          metadata: {
-            rarity: faker.helpers.arrayElement(['common', 'rare', 'epic']),
-            releaseDate: faker.date.future(),
+    products.map(async (product: any, index: number) => {
+      return prisma.collection
+        .create({
+          data: {
+            chain_id: '11155111',
+            contract_address: collectionAddresses[index],
+            metadata: {
+              rarity: faker.helpers.arrayElement(['common', 'rare', 'epic']),
+              releaseDate: faker.date.future(),
+            },
           },
-        },
-      });
+        })
+        .then(async (response) => {
+          await prisma.productCollection.create({
+            data: {
+              product_id: product.id,
+              collection_id: response.id,
+            },
+          });
+
+          return response;
+        });
     }),
   );
 
