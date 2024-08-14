@@ -4,7 +4,7 @@ import { query } from '#common/elastic-search';
 
 export const searchProductionRoute: Hapi.ServerRoute = {
   method: 'GET',
-  path: '/products/search',
+  path: '/search',
   options: {
     description: 'Search product by name, owner',
     notes: 'Search product by name, owner',

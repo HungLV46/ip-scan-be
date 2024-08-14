@@ -39,6 +39,49 @@ curl -X GET 'http://localhost:9200/products/_search?pretty' -H 'Content-Type: ap
 }'
 
 curl -X GET 'http://localhost:9200/products/_search?pretty' -H 'Content-Type: application/json' -d '{
+    "query" : {
+        "wildcard": {
+            "name": {
+                "value": "Olala"
+            }
+        }
+    }
+}'
+
+curl -X GET 'http://localhost:9200/products/_search?pretty' -H 'Content-Type: application/json' -d '{
+    "query" : {
+        "regexp": {
+            "name": {
+                "value": "la+",
+                "flags": "ALL",
+                "case_insensitive": true,
+                "rewrite": "constant_score"          
+            }
+        }
+    }
+}'
+
+curl -X GET 'http://localhost:9200/products/_search?pretty' -H 'Content-Type: application/json' -d '{
+    "query": {
+        "match_phrase": {
+            "name": {
+                "query": "Olala"                
+            }
+        }
+    }
+}'
+
+# Search proximity with multiple fields
+curl -X GET 'http://localhost:9200/products/_search?pretty' -H 'Content-Type: application/json' -d '{
+    "query": {
+        "query_string": {
+            "query": "*Olala*",
+            "fields": ["name", "owner.name"]
+        }
+    }
+}'
+
+curl -X GET 'http://localhost:9200/products/_search?pretty' -H 'Content-Type: application/json' -d '{
     "query" : { 
         "bool": {
             "filter": [

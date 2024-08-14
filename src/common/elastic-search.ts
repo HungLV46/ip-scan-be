@@ -11,7 +11,7 @@ if (config.elasticsearchUrl) {
 }
 
 export const query = async (params: any) => {
-  return await productIndex.query(params);
+  return await productIndex.querySearch(params);
 };
 
 export { elasticsearch };
