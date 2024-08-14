@@ -119,12 +119,9 @@ export const query = async (params: {
   let esQuery = undefined;
 
   esQuery = {
-    bool: {
-      filter: [
-        {
-          term: { category: params.keyword },
-        },
-      ],
+    multi_match: {
+      query: params.keyword || '',
+      fields: ['*name'],
     },
   };
 
