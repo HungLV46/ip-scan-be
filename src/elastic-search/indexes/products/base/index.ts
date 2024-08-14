@@ -12,7 +12,7 @@ export interface ProductDocument extends BaseDocument {
   featured_at: Date;
   updated_at: Date;
 
-  collections: CollectionDocument[];
+  product_collections: CollectionDocument[];
   attributes: ProductAttributeDocument[];
 }
 
@@ -52,7 +52,7 @@ export interface BuildProductDocumentData extends BuildDocumentData {
   featured_at: Date;
   updated_at: Date;
 
-  collections: CollectionDocument[];
+  product_collections: CollectionDocument[];
   attributes: ProductAttributeDocument[];
 }
 

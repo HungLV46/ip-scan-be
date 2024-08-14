@@ -156,7 +156,7 @@ const getDataByProductId = async (
     bool: {
       must: [
         {
-          term: { product_id: productId },
+          term: { id: productId },
         },
       ],
     },
