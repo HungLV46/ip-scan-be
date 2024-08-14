@@ -5,6 +5,7 @@
   "author": "HungLV",
   "license": "MIT",
   "private": true,
+  "type": "commonjs",
   "scripts": {
     "prepare": "husky",
     "clean": "rm -rf ./dist tsconfig.tsbuildinfo",
@@ -66,6 +67,7 @@
     "typescript-eslint": "^7.18.0"
   },
   "imports": {
+    "#root/*": "./dist/*.js",
     "#apis/*": "./dist/apis/*.js",
     "#common/*": "./dist/common/*.js",
     "#configs/*": "./dist/configs/*.js",

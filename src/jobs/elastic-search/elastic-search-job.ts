@@ -1,6 +1,6 @@
 import { redis } from '#common/redis';
 import { Worker, Job, Queue } from 'bullmq';
-import * as productsIndex from 'elastic-search/indexes/products';
+import * as productsIndex from '#root/elastic-search/indexes/products/index';
 
 const QUEUE_NAME = 'products-queue';
 const JOB_NAME = 'products-job';

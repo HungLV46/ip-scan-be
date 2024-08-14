@@ -13,7 +13,7 @@ import { loggerSetting, logger } from '#common/loggger';
 import * as routes from './routes';
 import { getAllQueues } from '#jobs/index';
 import * as elasticSearchJob from '#jobs/elastic-search/elastic-search-job';
-import { initIndexes } from 'elastic-search/indexes';
+import { initIndexes } from '#root/elastic-search/indexes/index';
 import { Prisma } from '@prisma/client';
 import Boom from '@hapi/boom';
 
