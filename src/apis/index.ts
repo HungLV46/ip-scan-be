@@ -14,6 +14,8 @@ import * as routes from './routes';
 import { getAllQueues } from '#jobs/index';
 import * as elasticSearchJob from '#jobs/elastic-search/elastic-search-job';
 import { initIndexes } from 'elastic-search/indexes';
+import { Prisma } from '@prisma/client';
+import Boom from '@hapi/boom';
 
 async function registerPlugins(server: Hapi.Server): Promise<void> {
   // log
@@ -47,6 +49,23 @@ export function routeApis(server: Hapi.Server): void {
   Object.values(routes).forEach((route) => server.route(route));
 }
 
+function setupServerResponseTransformation(server: Hapi.Server): void {
+  server.ext('onPreResponse', (request, h) => {
+    const response = request.response;
+
+    // DB: unique constraint
+    if (response instanceof Prisma.PrismaClientKnownRequestError) {
+      if (response.code === 'P2002') {
+        throw Boom.badRequest(
+          `${response.meta?.modelName} (${((response.meta?.target as Array<string>) || []).join(',')}) must be unique!`,
+        );
+      }
+    }
+
+    return h.continue;
+  });
+}
+
 async function registerAdapters(server: Hapi.Server) {
   // bull board
   const serverAdapter = new HapiAdapter();
@@ -69,6 +88,16 @@ async function initServer(): Promise<void> {
     port: config.port,
     host: config.host,
     debug: false,
+    routes: {
+      validate: {
+        failAction: async (request, h, err) => {
+          // https://github.com/hapijs/hapi/issues/3658
+          // as mentioned in above "Input validation errors are no longer passed directly from joi to the client."
+          // So a general message will be returned, which doesn't sufficient to debug API call
+          if (err) throw Boom.boomify(err); // TODO check if resposne error is HTML escaped
+        },
+      },
+    },
   });
 
   await registerPlugins(server);
@@ -77,6 +106,7 @@ async function initServer(): Promise<void> {
   await registerJobs();
 
   routeApis(server);
+  setupServerResponseTransformation(server);
 
   await server.start();
 }
