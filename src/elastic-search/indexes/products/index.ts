@@ -120,7 +120,7 @@ export const querySearch = async (params: {
 
   esQuery = {
     query_string: {
-      query: `*${params.keyword || ''}`,
+      query: `*${params.keyword || ''}*`,
       fields: ['name', 'owner.name'],
     },
   };

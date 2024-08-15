@@ -1,6 +1,6 @@
 import Hapi from '@hapi/hapi';
-// import Joi from 'joi';
 import { query } from '#common/elastic-search';
+import Joi from 'joi';
 
 export const searchProductionRoute: Hapi.ServerRoute = {
   method: 'GET',
@@ -12,12 +12,17 @@ export const searchProductionRoute: Hapi.ServerRoute = {
     plugins: {
       'hapi-swagger': {},
     },
+    validate: {
+      query: Joi.object({
+        name: Joi.string().required().example('Product name'),
+      }),
+    },
     cache: {
       // client side cache for 30s
       expiresIn: 30 * 1000,
       privacy: 'private',
     },
-    // response: { schema: Joi.object({}) }
+    // response: { schema: Joi.object({}) },
   },
   handler: (request: Hapi.Request) => {
     const { name } = request.query;
