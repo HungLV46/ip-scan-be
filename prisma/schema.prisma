@@ -39,7 +39,7 @@ model Product {
   description String
   avatar_img  String
   banner_img  String
-  metadata    Json
+  metadata    Json?
   owner_id    Int
   featured_at DateTime?
   created_at  DateTime  @default(now())
@@ -89,7 +89,7 @@ model Collection {
   name             String?
   chain_id         String
   contract_address String
-  metadata         Json
+  metadata         Json?
 
   nfts                Nft[]
   product_collections ProductCollection[]
