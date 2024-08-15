@@ -112,32 +112,29 @@ export const initIndex = async (): Promise<void> => {
   }
 };
 
-export const query = async (params: {
+export const querySearch = async (params: {
   keyword?: string;
   limit?: number;
 }): Promise<any> => {
   let esQuery = undefined;
 
   esQuery = {
-    bool: {
-      filter: [
-        {
-          term: { category: params.keyword },
-        },
-      ],
+    query_string: {
+      query: `*${params.keyword || ''}*`,
+      fields: ['name', 'owner.name'],
     },
   };
 
   const esSearchParams = {
     index: INDEX_NAME,
     query: esQuery,
-    size: params.limit,
+    size: params.limit || 10,
   };
 
   const esResult = await elasticsearch.search<ProductDocument>(esSearchParams);
-  console.log('elasticsearch-products', JSON.stringify(esResult));
+  const results = esResult.hits.hits.map((hit) => hit._source!);
 
-  return { esResult };
+  return results;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
