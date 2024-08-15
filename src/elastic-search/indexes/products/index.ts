@@ -255,3 +255,24 @@ export const syncDataMissing = async (): Promise<void> => {
     );
   }
 };
+
+export function filter(query: any) {
+  let esQuery = undefined;
+
+  esQuery = {
+    bool: {
+      filter: [
+        {
+          term: { ['chain.id']: '' },
+        },
+      ],
+    },
+  };
+
+  if (query.chainId) {
+    const chainId = query.chainId;
+    (esQuery as any).bool.filter.push({
+      terms: { 'product_collections.chain_id': chainId },
+    });
+  }
+}

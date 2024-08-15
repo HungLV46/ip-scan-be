@@ -13,7 +13,7 @@ curl -X GET 'http://localhost:9200/products/_search?pretty' -H 'Content-Type: ap
 # Get document by product id
 curl -X GET 'http://localhost:9200/products/_search?pretty' -H 'Content-Type: application/json' -d '{
     "query" : { 
-        "match" : {"product_id": "1"}
+        "match" : {"id": "1"}
     }
 }'
 
@@ -43,9 +43,7 @@ curl -X GET 'http://localhost:9200/products/_search?pretty' -H 'Content-Type: ap
     "query" : { 
         "bool": {
             "filter": [
-                { "term": { "collections.id": "2" }},
-                { "term": { "collections.chain_id": "11155111" }},
-                { "term": { "attributes.value": "Ethereum" }}
+                { "term": { "product_collections.chain_id": "11155111" }}
             ]
         }
     }
