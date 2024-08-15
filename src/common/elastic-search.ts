@@ -14,4 +14,8 @@ export const filter = async (query: any) => {
   productIndex.filter(query);
 };
 
+export const queryProducts = async (params: any) => {
+  return await productIndex.querySearch(params);
+};
+
 export { elasticsearch };
