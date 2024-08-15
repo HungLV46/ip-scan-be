@@ -1,5 +1,5 @@
 import { BuildDocumentData, DocumentBuilder } from './../../base/index';
-import { BaseDocument } from 'elastic-search/indexes/base';
+import { BaseDocument } from '#root/elastic-search/indexes/base/index';
 
 export interface ProductDocument extends BaseDocument {
   name: string;
