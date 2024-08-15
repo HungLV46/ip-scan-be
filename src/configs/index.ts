@@ -14,4 +14,12 @@ export const config = {
 
   // Network
   chainId: Number(process.env.CHAIN_ID || 1),
+
+  // AWS
+  s3Region: String(process.env.S3_REGION || ''),
+  s3AccessKeyId: String(process.env.S3_ACCESS_KEY_ID || ''),
+  s3SecretAccessKey: String(process.env.S3_ACCESS_KEY || ''),
+  s3DomainName: String(process.env.S3_DOMAIN_NAME || ''),
+  s3BucketName: String(process.env.S3_BUCKET_NAME || ''),
+  s3BucketFolder: String(process.env.S3_BUCKET_FOLDER || ''),
 };
