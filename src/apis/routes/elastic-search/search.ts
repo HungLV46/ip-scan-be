@@ -1,5 +1,5 @@
 import Hapi from '@hapi/hapi';
-import { query } from '#common/elastic-search';
+import { queryProducts } from '#common/elastic-search';
 import Joi from 'joi';
 
 export const searchProductionRoute: Hapi.ServerRoute = {
@@ -15,6 +15,7 @@ export const searchProductionRoute: Hapi.ServerRoute = {
     validate: {
       query: Joi.object({
         name: Joi.string().required().example('Product name'),
+        limit: Joi.number().max(100).default(10).example(10),
       }),
     },
     cache: {
@@ -25,8 +26,8 @@ export const searchProductionRoute: Hapi.ServerRoute = {
     // response: { schema: Joi.object({}) },
   },
   handler: (request: Hapi.Request) => {
-    const { name } = request.query;
+    const { name, limit } = request.query;
     console.log('request.query', request.query);
-    return query({ keyword: name });
+    return queryProducts({ keyword: name, limit });
   },
 };

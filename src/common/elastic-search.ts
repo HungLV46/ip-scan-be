@@ -10,7 +10,7 @@ if (config.elasticsearchUrl) {
   });
 }
 
-export const query = async (params: any) => {
+export const queryProducts = async (params: any) => {
   return await productIndex.querySearch(params);
 };
 

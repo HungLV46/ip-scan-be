@@ -128,7 +128,7 @@ export const querySearch = async (params: {
   const esSearchParams = {
     index: INDEX_NAME,
     query: esQuery,
-    size: params.limit,
+    size: params.limit || 10,
   };
 
   const esResult = await elasticsearch.search<ProductDocument>(esSearchParams);

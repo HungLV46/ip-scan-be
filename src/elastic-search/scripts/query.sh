@@ -82,6 +82,17 @@ curl -X GET 'http://localhost:9200/products/_search?pretty' -H 'Content-Type: ap
 }'
 
 curl -X GET 'http://localhost:9200/products/_search?pretty' -H 'Content-Type: application/json' -d '{
+    "query": {
+        "fuzzy": {
+            "name": {
+                "value": "Olala",
+                "fuzziness": "AUTO:3..5"
+            }       
+        }
+    }
+}'
+
+curl -X GET 'http://localhost:9200/products/_search?pretty' -H 'Content-Type: application/json' -d '{
     "query" : { 
         "bool": {
             "filter": [
