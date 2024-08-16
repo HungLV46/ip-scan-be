@@ -16,6 +16,7 @@ export const updateProductionRoute: Hapi.ServerRoute = {
         id: Joi.number().required().example(1),
       }),
       payload: Joi.object({
+        // TODO make optional
         name: Joi.string().required().example('Product name'),
         owner_id: Joi.number().required().example(1),
         avatar_img: Joi.string()
@@ -43,7 +44,7 @@ export const updateProductionRoute: Hapi.ServerRoute = {
               'https://loremflickr.com/640/480?lock=1572275828555776',
               'https://loremflickr.com/640/480?lock=1572275828555776',
             ]),
-          cta_link: Joi.string().example('https://www.google.com'),
+          cta_url: Joi.string().default('').example('https://www.google.com'),
         }).required(),
         collections: Joi.array()
           .items(
