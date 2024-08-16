@@ -25,11 +25,26 @@ model User {
   banner_img      String
   additional_info Json?
 
-  products Product[]
+  products        Product[]
+  user_attributes UserAttribute[]
 
   @@index(name)
   @@index(wallet_address)
   @@map("users")
+}
+
+model UserAttribute {
+  id      Int    @id @default(autoincrement())
+  name    String
+  value   String
+  user_id Int
+
+  user User @relation(fields: [user_id], references: [id])
+
+  @@unique([name, value, user_id])
+  @@index([name, value])
+  @@index(user_id)
+  @@map("user_attributes")
 }
 
 model Product {
@@ -109,6 +124,7 @@ model ProductCollection {
   product    Product    @relation(fields: [product_id], references: [id])
   collection Collection @relation(fields: [collection_id], references: [id])
 
+  @@unique([product_id, collection_id])
   @@index([product_id])
   @@index([collection_id])
   @@map("product_collections")
