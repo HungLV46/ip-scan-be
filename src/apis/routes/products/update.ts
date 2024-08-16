@@ -3,7 +3,7 @@ import { prisma } from '#common/db';
 import { Prisma } from '@prisma/client';
 import Joi from 'joi';
 
-export const updateProductionRoute: Hapi.ServerRoute = {
+export const updateProductRoute: Hapi.ServerRoute = {
   method: 'PUT',
   path: '/products/{id}',
   options: {
@@ -17,35 +17,43 @@ export const updateProductionRoute: Hapi.ServerRoute = {
       }),
       payload: Joi.object({
         // TODO make optional
-        name: Joi.string().required().example('Product name'),
-        owner_id: Joi.number().required().example(1),
+        name: Joi.string().optional().example('Product name'),
+        owner_id: Joi.number().optional().example(1),
         avatar_img: Joi.string()
-          .required()
+          .optional()
           .example('https://loremflickr.com/640/480?lock=1572275828555776'),
         banner_img: Joi.string()
-          .required()
+          .optional()
           .example('https://loremflickr.com/640/480?lock=1572275828555776'),
-        category: Joi.string().required().example('game'),
-        description: Joi.string().required().example('description of product'),
-        featured: Joi.boolean().default(false),
+        category: Joi.string().optional().example('game'),
+        description: Joi.string().optional().example('description of product'),
+        featured: Joi.boolean().optional().default(false).example('false'),
         attributes: Joi.array()
           .items(
             Joi.object({
-              name: Joi.string().required().example('attribute name'),
-              value: Joi.string().required().example('attribute value'),
+              name: Joi.string().required(),
+              value: Joi.string().required(),
             }),
           )
-          .default([]),
+          .optional()
+          .default([])
+          .example([
+            { name: 'attribute name', value: 'attribute value' },
+            { name: 'attribute name 2', value: 'attribute value 2' },
+          ]),
         metadata: Joi.object({
-          previews: Joi.array()
-            .items(Joi.string())
-            .default([])
-            .example([
+          previews: Joi.array().items(Joi.string()).optional().default([]),
+          cta_url: Joi.string().optional().default(''),
+        })
+          .optional()
+          .default({})
+          .example({
+            previews: [
               'https://loremflickr.com/640/480?lock=1572275828555776',
               'https://loremflickr.com/640/480?lock=1572275828555776',
-            ]),
-          cta_url: Joi.string().default('').example('https://www.google.com'),
-        }).required(),
+            ],
+            cta_url: 'https://www.google.com',
+          }),
         collections: Joi.array()
           .items(
             Joi.object({
@@ -53,6 +61,7 @@ export const updateProductionRoute: Hapi.ServerRoute = {
               contract_address: Joi.string().required(),
             }),
           )
+          .optional()
           .default([])
           .example([
             { chain_id: '1', contract_address: '0x1234x' },
@@ -76,7 +85,7 @@ export const updateProductionRoute: Hapi.ServerRoute = {
     } as Prisma.ProductUpdateInput;
     const id = request.params.id;
 
-    // create new collections
+    // create new collections TODO refactor
     const existingCollections = await prisma.collection.findMany({
       where: { OR: payload.collections as any /** TODO use where in */ },
     });
@@ -97,7 +106,7 @@ export const updateProductionRoute: Hapi.ServerRoute = {
       });
     }
 
-    // update product & create new product - collection relation
+    // update product & create new product - collection relation TODO refactor
     await Promise.all([
       prisma.product.update({
         where: { id: Number(request.params.id) },

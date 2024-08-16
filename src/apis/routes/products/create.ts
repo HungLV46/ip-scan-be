@@ -3,7 +3,7 @@ import { prisma } from '#common/db';
 import Joi from 'joi';
 import { Prisma } from '@prisma/client';
 
-export const createProductionRoute: Hapi.ServerRoute = {
+export const createProductRoute: Hapi.ServerRoute = {
   method: 'POST',
   path: '/products',
   options: {
@@ -31,6 +31,7 @@ export const createProductionRoute: Hapi.ServerRoute = {
               value: Joi.string().required().example('attribute value'),
             }),
           )
+          .optional()
           .default([]),
         metadata: Joi.object({
           previews: Joi.array()
@@ -41,7 +42,9 @@ export const createProductionRoute: Hapi.ServerRoute = {
               'https://loremflickr.com/640/480?lock=1572275828555776',
             ]),
           cta_url: Joi.string().default('').example('https://www.google.com'),
-        }).required(),
+        })
+          .optional()
+          .default({}),
         collections: Joi.array()
           .items(
             Joi.object({
