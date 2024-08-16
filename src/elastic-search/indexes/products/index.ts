@@ -6,6 +6,7 @@ import {
   ProductDocument,
   ProductDocumentBuilder,
 } from './base';
+import { CONFIG } from './config';
 import { productToProductDocumentData } from './utils';
 
 const INDEX_NAME = 'products';
@@ -58,6 +59,9 @@ export const getIndexName = (): string => {
 
 export const initIndex = async (): Promise<void> => {
   try {
+    // get config
+    const indexConfig = CONFIG;
+
     if (await elasticsearch.indices.exists({ index: INDEX_NAME })) {
       console.info(
         'elasticsearch-products',
@@ -67,6 +71,36 @@ export const initIndex = async (): Promise<void> => {
           indexName: INDEX_NAME,
         }),
       );
+
+      // check config & update mappings --> pending
+      /*********** 
+      const network = getNetworkSettings();
+      if (network.elasticSearch?.indexes?.[INDEX_NAME].disableMappingsUpdate) {
+        return;
+      }
+
+      const getIndexResponse = await elasticsearch.indices.get({
+        index: INDEX_NAME,
+      });
+
+      const indexName = Object.keys(getIndexResponse)[0];
+
+      const putMappingResponse = await elasticsearch.indices.putMapping({
+        index: indexName,
+        properties: indexConfig.mappings.properties,
+      });
+
+      console.log(
+        'elasticsearch-products',
+        JSON.stringify({
+          topic: 'initIndex',
+          message: 'Updated mappings.',
+          indexName: INDEX_NAME,
+          indexConfig,
+          putMappingResponse,
+        }),
+      );
+      ************/
     } else {
       console.info(
         'elasticsearch-products',
@@ -82,6 +116,7 @@ export const initIndex = async (): Promise<void> => {
           [INDEX_NAME]: {},
         },
         index: `${INDEX_NAME}-${Date.now()}`,
+        ...indexConfig,
       };
 
       const createIndexResponse = await elasticsearch.indices.create(params);
