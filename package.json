@@ -42,6 +42,7 @@
     "ioredis": "^5.4.1",
     "joi": "^17.13.3",
     "lint-check": "^0.0.2",
+    "lodash": "^4.17.21",
     "pino": "^9.3.2",
     "underscore": "^1.13.7",
     "viem": "^2.19.2"
@@ -51,6 +52,7 @@
     "@faker-js/faker": "^8.4.1",
     "@hapi/code": "^9.0.3",
     "@hapi/lab": "^25.3.1",
+    "@types/lodash": "^4.17.7",
     "@types/node": "^20.14.12",
     "eslint": "9.x",
     "git-format-staged": "^3.1.1",

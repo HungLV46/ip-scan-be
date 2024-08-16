@@ -112,6 +112,32 @@ curl -X GET 'http://localhost:9200/products/_search?pretty' -H 'Content-Type: ap
     }
 }'
 
+curl -X GET 'http://localhost:9200/products/_search?pretty' -H 'Content-Type: application/json' -d '{
+    "query" : { 
+        "bool": {
+            "filter": [
+                {"terms":{ "product_collections.chain_id" :"11155111"}}
+            ]
+            }
+        }
+    }
+}'
+
+curl -X GET 'http://localhost:9200/products/_search?pretty' -H 'Content-Type: application/json' -d '{
+    "query": {
+        "nested": {
+        "path": "product_collections",
+        "query": {
+            "bool": {
+            "must": [
+                { "match": { "product_collections.chain_id": "11155111" }}
+            ]
+            }
+        }
+        }
+    }
+}'
+
 # Delete all documents
 curl \
  -X POST http://localhost:9200/products/_delete_by_query \

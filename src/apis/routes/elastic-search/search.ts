@@ -8,7 +8,7 @@ export const searchProductionRoute: Hapi.ServerRoute = {
   options: {
     description: 'Search product by name, owner',
     notes: 'Search product by name, owner',
-    tags: ['api', 'Product'],
+    tags: ['api', 'product', 'search'],
     plugins: {
       'hapi-swagger': {},
     },
