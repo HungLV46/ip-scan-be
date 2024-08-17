@@ -1,4 +1,4 @@
-import { logger } from '#common/loggger';
+import { save } from '#common/aws';
 import Hapi from '@hapi/hapi';
 import Joi from 'joi';
 
@@ -21,18 +21,19 @@ export const uploadFileRoute: Hapi.ServerRoute = {
           .description('file to upload'),
       }),
     },
+    // parse = true, will load the whole file to memory
     payload: {
       multipart: true,
       maxBytes: 1048576,
       parse: true,
-      output: 'file',
+      output: 'stream',
     },
   },
   handler: async (request: Hapi.Request) => {
-    const file = request.payload;
-    logger.warn(file);
-    return {
-      message: 'Uploaded',
-    };
+    const file = request.payload as any;
+
+    const s3Url = await save(file);
+
+    return { data: { s3_url: s3Url } };
   },
 };
