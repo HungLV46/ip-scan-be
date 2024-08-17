@@ -8,7 +8,7 @@ export const updateUserRoute: Hapi.ServerRoute = {
   path: '/users/{id}',
   options: {
     description: 'Update user by its ID',
-    notes: 'Update user, its attributes and collections',
+    notes: 'Update user, its attributes',
     tags: ['api', 'user', 'update'],
     plugins: { 'hapi-swagger': {} },
     validate: {

@@ -3,7 +3,7 @@ import { prisma } from '#common/db';
 import Joi from 'joi';
 import { Prisma } from '@prisma/client';
 
-export const createUserionRoute: Hapi.ServerRoute = {
+export const createUserRoute: Hapi.ServerRoute = {
   method: 'POST',
   path: '/users',
   options: {
