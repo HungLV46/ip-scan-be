@@ -25,8 +25,8 @@ model User {
   banner_img      String
   additional_info Json?
 
-  products        Product[]
-  user_attributes UserAttribute[]
+  products   Product[]
+  attributes UserAttribute[]
 
   @@index(name)
   @@index(wallet_address)
