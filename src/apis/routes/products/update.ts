@@ -75,13 +75,15 @@ export const updateProductRoute: Hapi.ServerRoute = {
     const payload = request.payload as any;
     const product = {
       name: payload.name,
-      owner: { connect: { id: payload.owner_id } },
+      owner: payload.owner_id
+        ? { connect: { id: payload.owner_id } }
+        : undefined,
       avatar_img: payload.avatar_img,
       banner_img: payload.banner_img,
       category: payload.category,
       description: payload.description,
       metadata: payload.metadata,
-      featured_at: payload.featured ? new Date() : undefined,
+      featured_at: payload.featured ? new Date() : null,
     } as Prisma.ProductUpdateInput;
     const id = request.params.id;
 

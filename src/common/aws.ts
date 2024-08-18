@@ -1,7 +1,7 @@
 import { config } from '#configs/index';
 import { S3, PutObjectCommand } from '@aws-sdk/client-s3';
 import path from 'path';
-import randomstring from 'randomstring';
+import crypto from 'crypto';
 
 const s3 = new S3({
   region: config.s3Region,
@@ -15,8 +15,12 @@ function getS3Url(fileName: string) {
   return `https://${config.s3DomainName}/${config.s3BucketFolder}/${fileName}`;
 }
 
-function generateFilename(filename: string) {
-  return `${randomstring.generate({ length: 32, charset: 'alphanumeric' })}${path.extname(filename)}`;
+function generateFilename(filename: string, filedata: any) {
+  const hash = crypto.createHash('md5');
+  hash.update(filename);
+  hash.update(filedata);
+
+  return `${hash.digest('hex')}${path.extname(filename)}`;
 }
 
 function generateS3Key(fileName: string) {
@@ -36,24 +40,25 @@ async function isExit(filename: string): Promise<boolean> {
   }
 }
 
-async function save(fileStream: any): Promise<string> {
-  const filename = generateFilename(fileStream.file.hapi.filename);
+async function save(file: any): Promise<string> {
+  const filename = generateFilename(file.hapi.filename, file._data);
 
+  const s3Url = getS3Url(filename);
   if (await isExit(filename)) {
-    throw new Error(`Filename (${filename}) is already existed on S3`);
+    return s3Url;
   }
 
   const command = new PutObjectCommand({
     Bucket: config.s3BucketName,
-    Body: fileStream.file._data,
+    Body: file._data,
     Key: generateS3Key(filename),
-    ContentType: fileStream.file.hapi.headers['content-type'],
+    ContentType: file.hapi.headers['content-type'],
   });
 
   // Upload to s3
   await s3.send(command);
 
-  return getS3Url(filename);
+  return s3Url;
 }
 
 export { s3, save };

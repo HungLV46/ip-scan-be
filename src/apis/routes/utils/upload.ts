@@ -7,7 +7,8 @@ export const uploadFileRoute: Hapi.ServerRoute = {
   path: '/upload',
   options: {
     description: 'File upload',
-    notes: 'Upload file',
+    notes:
+      'This API uses MD5 hash of filename & file content for s3 key as a duplication avoidance mechanism.',
     tags: ['api', 'upload'],
     plugins: {
       'hapi-swagger': {
@@ -21,7 +22,7 @@ export const uploadFileRoute: Hapi.ServerRoute = {
           .description('file to upload'),
       }),
     },
-    // parse = true, will load the whole file to memory
+    // load the whole file to memory
     payload: {
       multipart: true,
       maxBytes: 1048576,
@@ -30,9 +31,7 @@ export const uploadFileRoute: Hapi.ServerRoute = {
     },
   },
   handler: async (request: Hapi.Request) => {
-    const file = request.payload as any;
-
-    const s3Url = await save(file);
+    const s3Url = await save((request.payload as any).file);
 
     return { data: { s3_url: s3Url } };
   },
