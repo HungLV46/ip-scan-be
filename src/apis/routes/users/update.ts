@@ -62,6 +62,8 @@ export const updateUserRoute: Hapi.ServerRoute = {
       bio: payload.bio,
       avatar_img: payload.avatar_img,
       banner_img: payload.banner_img,
+      email: payload.email,
+      wallet_address: payload.wallet_address,
       additional_info: payload.additional_info,
     } as Prisma.UserCreateInput;
 

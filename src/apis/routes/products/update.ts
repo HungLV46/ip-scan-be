@@ -42,8 +42,12 @@ export const updateProductRoute: Hapi.ServerRoute = {
             { name: 'attribute name 2', value: 'attribute value 2' },
           ]),
         metadata: Joi.object({
-          previews: Joi.array().items(Joi.string()).optional().default([]),
+          previews: Joi.array().optional().items(Joi.string()).default([]),
           cta_url: Joi.string().optional().default(''),
+          socials: Joi.array()
+            .optional()
+            .items(Joi.object({ name: Joi.string(), url: Joi.string() }))
+            .default([]),
         })
           .optional()
           .default({})
@@ -53,6 +57,10 @@ export const updateProductRoute: Hapi.ServerRoute = {
               'https://loremflickr.com/640/480?lock=1572275828555776',
             ],
             cta_url: 'https://www.google.com',
+            socials: [
+              { name: 'twitter', url: 'https://twitter.com' },
+              { name: 'discord', url: 'https://discord.com' },
+            ],
           }),
         collections: Joi.array()
           .items(

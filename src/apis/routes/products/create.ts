@@ -34,17 +34,26 @@ export const createProductRoute: Hapi.ServerRoute = {
           .optional()
           .default([]),
         metadata: Joi.object({
-          previews: Joi.array()
-            .items(Joi.string())
-            .default([])
-            .example([
-              'https://loremflickr.com/640/480?lock=1572275828555776',
-              'https://loremflickr.com/640/480?lock=1572275828555776',
-            ]),
-          cta_url: Joi.string().default('').example('https://www.google.com'),
+          previews: Joi.array().optional().items(Joi.string()).default([]),
+          cta_url: Joi.string().optional().default(''),
+          socials: Joi.array()
+            .optional()
+            .items(Joi.object({ name: Joi.string(), url: Joi.string() }))
+            .default([]),
         })
           .optional()
-          .default({}),
+          .default({})
+          .example({
+            previews: [
+              'https://loremflickr.com/640/480?lock=1572275828555776',
+              'https://loremflickr.com/640/480?lock=1572275828555776',
+            ],
+            cta_url: 'https://www.google.com',
+            socials: [
+              { name: 'twitter', url: 'https://twitter.com' },
+              { name: 'discord', url: 'https://discord.com' },
+            ],
+          }),
         collections: Joi.array()
           .items(
             Joi.object({
