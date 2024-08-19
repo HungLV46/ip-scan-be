@@ -11,6 +11,7 @@ export const config = {
   // Elasticsearch
   elasticsearchUrl: String(process.env.ELASTICSEARCH_URL || ''),
   doElasticsearchWork: Boolean(Number(process.env.DO_ELASTICSEARCH_WORK)),
+  clear_indexes: process.env.ELASTICSEARCH_CLEAR_INDEXES?.split(',') || [],
 
   // Network
   chainId: Number(process.env.CHAIN_ID || 1),

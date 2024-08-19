@@ -1,6 +1,7 @@
 import { prisma } from '#common/db';
 import { elasticsearch } from '#common/elastic-search';
 import { getLastIndexedTime, setLastIndexedTime } from '#common/redis';
+import { config } from '#root/configs';
 import {
   BuildProductDocumentData,
   ProductDocument,
@@ -61,6 +62,21 @@ export const initIndex = async (): Promise<void> => {
   try {
     // get config
     const indexConfig = CONFIG;
+
+    // Delete index and set last indexed time to 0
+    for (const index_name in config.clear_indexes) {
+      if (
+        await elasticsearch.indices.exists({
+          index: index_name,
+        })
+      ) {
+        await elasticsearch.indices.delete({
+          index: index_name,
+        });
+      }
+
+      await setLastIndexedTime(0);
+    }
 
     if (await elasticsearch.indices.exists({ index: INDEX_NAME })) {
       console.info(
