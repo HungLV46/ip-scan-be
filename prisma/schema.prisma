@@ -39,7 +39,7 @@ model UserAttribute {
   value   String
   user_id Int
 
-  user User @relation(fields: [user_id], references: [id])
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@unique([name, value, user_id])
   @@index([name, value])

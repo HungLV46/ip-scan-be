@@ -38,6 +38,7 @@ async function registerPlugins(server: Hapi.Server): Promise<void> {
           title: 'Test API Documentation',
           version: '1.0.0',
         },
+        schemes: ['http', 'https'],
         documentationPage: true,
         documentationPath: '/docs', // This sets the URL path for the Swagger UI
       },
