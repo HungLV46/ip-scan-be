@@ -64,14 +64,20 @@ export const initIndex = async (): Promise<void> => {
     const indexConfig = CONFIG;
 
     // Delete index and set last indexed time to 0
-    for (const index_name in config.clear_indexes) {
+    for (const indexNameClear of config.clear_indexes) {
       if (
         await elasticsearch.indices.exists({
-          index: index_name,
+          index: indexNameClear,
         })
       ) {
+        const getIndexResponse = await elasticsearch.indices.get({
+          index: indexNameClear,
+        });
+
+        const indexName = Object.keys(getIndexResponse)[0];
+
         await elasticsearch.indices.delete({
-          index: index_name,
+          index: indexName,
         });
       }
 
