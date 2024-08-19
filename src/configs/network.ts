@@ -87,32 +87,3 @@ export const aura_mainnet = defineChain({
     },
   },
 });
-
-type NetworkSetting = {
-  elasticSearch?: {
-    numberOfShards?: number;
-    indexes?: { [index: string]: ElasticsearchIndexSettings };
-  };
-};
-
-type ElasticsearchIndexSettings = {
-  numberOfShards?: number;
-  disableMappingsUpdate?: boolean;
-  configName?: string;
-};
-
-const defaultNetworkSettings: NetworkSetting = {
-  elasticSearch: {
-    numberOfShards: 2,
-    indexes: {
-      products: {
-        numberOfShards: 2,
-        disableMappingsUpdate: false,
-      },
-    },
-  },
-};
-
-export const getNetworkSettings = () => {
-  return defaultNetworkSettings;
-};

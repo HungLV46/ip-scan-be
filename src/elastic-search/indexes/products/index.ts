@@ -87,36 +87,6 @@ export const initIndex = async (): Promise<void> => {
           indexName: INDEX_NAME,
         }),
       );
-
-      // check config & update mappings --> pending
-      /*********** 
-      const network = getNetworkSettings();
-      if (network.elasticSearch?.indexes?.[INDEX_NAME].disableMappingsUpdate) {
-        return;
-      }
-
-      const getIndexResponse = await elasticsearch.indices.get({
-        index: INDEX_NAME,
-      });
-
-      const indexName = Object.keys(getIndexResponse)[0];
-
-      const putMappingResponse = await elasticsearch.indices.putMapping({
-        index: indexName,
-        properties: indexConfig.mappings.properties,
-      });
-
-      console.log(
-        'elasticsearch-products',
-        JSON.stringify({
-          topic: 'initIndex',
-          message: 'Updated mappings.',
-          indexName: INDEX_NAME,
-          indexConfig,
-          putMappingResponse,
-        }),
-      );
-      ************/
     } else {
       console.info(
         'elasticsearch-products',
