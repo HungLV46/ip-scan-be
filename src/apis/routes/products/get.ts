@@ -2,7 +2,7 @@ import Hapi from '@hapi/hapi';
 import { prisma } from '#common/db';
 import Joi from 'joi';
 
-export const getProductionRoute: Hapi.ServerRoute = {
+export const getProductRoute: Hapi.ServerRoute = {
   method: 'GET',
   path: '/products/{id}',
   options: {

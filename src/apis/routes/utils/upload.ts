@@ -1,4 +1,4 @@
-import { logger } from '#common/loggger';
+import { save } from '#common/aws';
 import Hapi from '@hapi/hapi';
 import Joi from 'joi';
 
@@ -7,7 +7,8 @@ export const uploadFileRoute: Hapi.ServerRoute = {
   path: '/upload',
   options: {
     description: 'File upload',
-    notes: 'Upload file',
+    notes:
+      'This API uses MD5 hash of filename & file content for s3 key as a duplication avoidance mechanism.',
     tags: ['api', 'upload'],
     plugins: {
       'hapi-swagger': {
@@ -21,18 +22,17 @@ export const uploadFileRoute: Hapi.ServerRoute = {
           .description('file to upload'),
       }),
     },
+    // load the whole file to memory
     payload: {
       multipart: true,
       maxBytes: 1048576,
       parse: true,
-      output: 'file',
+      output: 'stream',
     },
   },
   handler: async (request: Hapi.Request) => {
-    const file = request.payload;
-    logger.warn(file);
-    return {
-      message: 'Uploaded',
-    };
+    const s3Url = await save((request.payload as any).file);
+
+    return { data: { s3_url: s3Url } };
   },
 };

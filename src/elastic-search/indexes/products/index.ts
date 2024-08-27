@@ -7,6 +7,7 @@ import {
   ProductDocument,
   ProductDocumentBuilder,
 } from './base';
+import { CONFIG } from './config';
 import { productToProductDocumentData } from './utils';
 
 const INDEX_NAME = 'products';
@@ -59,6 +60,9 @@ export const getIndexName = (): string => {
 
 export const initIndex = async (): Promise<void> => {
   try {
+    // get config
+    const indexConfig = CONFIG;
+
     if (await elasticsearch.indices.exists({ index: INDEX_NAME })) {
       console.info(
         'elasticsearch-products',
@@ -83,6 +87,7 @@ export const initIndex = async (): Promise<void> => {
           [INDEX_NAME]: {},
         },
         index: `${INDEX_NAME}-${Date.now()}`,
+        ...indexConfig,
       };
 
       const createIndexResponse = await elasticsearch.indices.create(params);
@@ -97,6 +102,9 @@ export const initIndex = async (): Promise<void> => {
           createIndexResponse,
         }),
       );
+
+      // set last indexed time
+      await setLastIndexedTime(0);
     }
   } catch (error) {
     console.error(

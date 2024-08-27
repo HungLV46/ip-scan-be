@@ -3,7 +3,7 @@ import { prisma } from '#common/db';
 import Joi from 'joi';
 import { Prisma } from '@prisma/client';
 
-export const createProductionRoute: Hapi.ServerRoute = {
+export const createProductRoute: Hapi.ServerRoute = {
   method: 'POST',
   path: '/products',
   options: {
@@ -31,17 +31,29 @@ export const createProductionRoute: Hapi.ServerRoute = {
               value: Joi.string().required().example('attribute value'),
             }),
           )
+          .optional()
           .default([]),
         metadata: Joi.object({
-          previews: Joi.array()
-            .items(Joi.string())
-            .default([])
-            .example([
+          previews: Joi.array().optional().items(Joi.string()).default([]),
+          cta_url: Joi.string().optional().default(''),
+          socials: Joi.array()
+            .optional()
+            .items(Joi.object({ name: Joi.string(), url: Joi.string() }))
+            .default([]),
+        })
+          .optional()
+          .default({})
+          .example({
+            previews: [
               'https://loremflickr.com/640/480?lock=1572275828555776',
               'https://loremflickr.com/640/480?lock=1572275828555776',
-            ]),
-          cta_url: Joi.string().default('').example('https://www.google.com'),
-        }).required(),
+            ],
+            cta_url: 'https://www.google.com',
+            socials: [
+              { name: 'twitter', url: 'https://twitter.com' },
+              { name: 'discord', url: 'https://discord.com' },
+            ],
+          }),
         collections: Joi.array()
           .items(
             Joi.object({

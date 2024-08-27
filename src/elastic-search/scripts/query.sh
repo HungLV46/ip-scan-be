@@ -113,11 +113,20 @@ curl -X GET 'http://localhost:9200/products/_search?pretty' -H 'Content-Type: ap
 }'
 
 curl -X GET 'http://localhost:9200/products/_search?pretty' -H 'Content-Type: application/json' -d '{
-    "query" : { 
-        "bool": {
-            "filter": [
-                {"terms":{ "product_collections.chain_id" :"11155111"}}
-            ]
+    "query": {
+        "nested": {
+        "path": "product_collections",
+        "query": {
+            "nested": {
+                "path": "product_collections.collection",
+                "query": { 
+                    "bool": {
+                        "must": [
+                            { "match": { "product_collections.collection.contract_address": "0xE8D51F1C9AE2C4cE1aa48598aC0A36C47F957fD3" }}
+                            ]
+                        }
+                    }
+                }
             }
         }
     }
@@ -126,14 +135,15 @@ curl -X GET 'http://localhost:9200/products/_search?pretty' -H 'Content-Type: ap
 curl -X GET 'http://localhost:9200/products/_search?pretty' -H 'Content-Type: application/json' -d '{
     "query": {
         "nested": {
-        "path": "product_collections",
+        "path": "attributes",
         "query": {
             "bool": {
-            "must": [
-                { "match": { "product_collections.chain_id": "11155111" }}
-            ]
+                "must": [
+                    { "match": { "attributes.name": "genre" }},
+                    { "match": { "attributes.value": "Survival" }}
+                    ]
+                }
             }
-        }
         }
     }
 }'
@@ -148,4 +158,4 @@ curl \
     }
  }'
 
- curl -X DELETE "http://localhost:9200/products-1723004571946"
+ curl -X DELETE "http://localhost:9200/products-1723799098975"
