@@ -114,6 +114,42 @@ curl -X GET 'http://localhost:9200/products/_search?pretty' -H 'Content-Type: ap
     }
 }'
 
+curl -X GET 'http://localhost:9200/products/_search?pretty' -H 'Content-Type: application/json' -d '{
+    "query": {
+        "nested": {
+        "path": "product_collections",
+        "query": {
+            "nested": {
+                "path": "product_collections.collection",
+                "query": { 
+                    "bool": {
+                        "must": [
+                            { "match": { "product_collections.collection.contract_address": "0xE8D51F1C9AE2C4cE1aa48598aC0A36C47F957fD3" }}
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    }
+}'
+
+curl -X GET 'http://localhost:9200/products/_search?pretty' -H 'Content-Type: application/json' -d '{
+    "query": {
+        "nested": {
+        "path": "attributes",
+        "query": {
+            "bool": {
+                "must": [
+                    { "match": { "attributes.name": "genre" }},
+                    { "match": { "attributes.value": "Survival" }}
+                    ]
+                }
+            }
+        }
+    }
+}'
+
 # Delete all documents
 curl \
  -X POST http://localhost:9200/products/_delete_by_query \
@@ -124,4 +160,4 @@ curl \
     }
  }'
 
- curl -X DELETE "http://localhost:9200/products-1723004571946"
+ curl -X DELETE "http://localhost:9200/products-1723799098975"
