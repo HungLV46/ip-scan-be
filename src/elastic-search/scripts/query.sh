@@ -1,10 +1,19 @@
 #!/bin/bash
+URL_LOCAL="http://localhost:9200"
+URL_DEV="http://elasticsearch.elasticsearch:9200"
 
 # Get indexes
 curl -X GET "http://localhost:9200/_cat/indices?v"
+curl -X GET "http://elasticsearch.elasticsearch:9200/_cat/indices?v"
 
 # Get all documents from products index
 curl -X GET 'http://localhost:9200/products/_search?pretty' -H 'Content-Type: application/json' -d '{
+    "query" : { 
+        "match_all" : {}
+    }
+}'
+
+curl -X GET 'http://elasticsearch.elasticsearch:9200/products/_search?pretty' -H 'Content-Type: application/json' -d '{
     "query" : { 
         "match_all" : {}
     }
@@ -119,15 +128,59 @@ curl -X GET 'http://localhost:9200/products/_search?pretty' -H 'Content-Type: ap
         "query": {
             "nested": {
                 "path": "product_collections.collection",
-                "query": { 
+                "query": {
                     "bool": {
                         "must": [
-                            { "match": { "product_collections.collection.contract_address": "0xE8D51F1C9AE2C4cE1aa48598aC0A36C47F957fD3" }}
+                            { "terms": { "product_collections.collection.chain_id": ["11155111"] }}
                             ]
                         }
                     }
                 }
             }
+        }
+    },
+}'
+
+curl -X GET 'http://localhost:9200/products/_search?pretty' -H 'Content-Type: application/json' -d '{
+    "query": {
+        "bool": {
+            "filter": [
+            {
+                "nested": {
+                "path": "product_collections",
+                "query": {
+                    "nested": {
+                    "path": "product_collections.collection",
+                    "query": {
+                        "bool": {
+                        "filter": [
+                            {
+                            "terms": {
+                                "product_collections.collection.chain_id": ["11155111"]
+                            }
+                            }
+                        ]
+                        }
+                    }
+                    }
+                }
+                }
+            },
+            { "terms": { "category": ["game", "manga", "art"] } },
+            {
+                "nested": {
+                "path": "attributes",
+                "query": {
+                    "bool": {
+                    "filter": [
+                        { "term": { "attributes.name": "player info" }},
+                        {"terms": { "attributes.value": ["Singleplayer"] }}
+                    ]
+                    }
+                }
+                }
+            }
+            ]
         }
     }
 }'
@@ -159,3 +212,4 @@ curl \
  }'
 
  curl -X DELETE "http://localhost:9200/products-1723799098975"
+ curl -X DELETE "$URL_DEV/products-1723606638996"

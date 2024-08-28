@@ -284,7 +284,26 @@ export async function queryFilter(params: {
 
   if (params.chainIds?.length) {
     (esQuery as any).bool.filter.push({
-      terms: { 'product_collections.chain_id': params.chainIds },
+      nested: {
+        path: 'product_collections',
+        query: {
+          nested: {
+            path: 'product_collections.collection',
+            query: {
+              bool: {
+                filter: [
+                  {
+                    terms: {
+                      'product_collections.collection.chain_id':
+                        params.chainIds,
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
     });
   }
 
@@ -296,71 +315,113 @@ export async function queryFilter(params: {
 
   if (params.playerInfos?.length) {
     (esQuery as any).bool.filter.push({
-      terms: { 'attribute.name': ATTRIBUTES_NAME.PlayerInfo },
-    });
-
-    (esQuery as any).bool.filter.push({
-      terms: { player_info: params.playerInfos },
+      nested: {
+        path: 'attributes',
+        query: {
+          bool: {
+            filter: [
+              { term: { 'attributes.name': ATTRIBUTES_NAME.PlayerInfo } },
+              { terms: { 'attributes.value': params.playerInfos } },
+            ],
+          },
+        },
+      },
     });
   }
 
   if (params.gameStatuses?.length) {
-    (esQuery as any).bool.filter
-      .push({
-        terms: { 'attribute.name': ATTRIBUTES_NAME.Status },
-      })(esQuery as any)
-      .bool.filter.push({
-        terms: { game_status: params.gameStatuses },
-      });
+    (esQuery as any).bool.filter.push({
+      nested: {
+        path: 'attributes',
+        query: {
+          bool: {
+            filter: [
+              { term: { 'attributes.name': ATTRIBUTES_NAME.Status } },
+              { terms: { 'attributes.value': params.gameStatuses } },
+            ],
+          },
+        },
+      },
+    });
   }
 
   if (params.gameGenres?.length) {
     (esQuery as any).bool.filter.push({
-      terms: { 'attribute.name': ATTRIBUTES_NAME.Genre },
-    });
-
-    (esQuery as any).bool.filter.push({
-      terms: { game_genre: params.gameGenres },
+      nested: {
+        path: 'attributes',
+        query: {
+          bool: {
+            filter: [
+              { term: { 'attributes.name': ATTRIBUTES_NAME.Genre } },
+              { terms: { 'attributes.value': params.gameGenres } },
+            ],
+          },
+        },
+      },
     });
   }
 
   if (params.gameModes?.length) {
     (esQuery as any).bool.filter.push({
-      terms: { 'attribute.name': ATTRIBUTES_NAME.GameMode },
-    });
-
-    (esQuery as any).bool.filter.push({
-      terms: { game_mode: params.gameModes },
+      nested: {
+        path: 'attributes',
+        query: {
+          bool: {
+            filter: [
+              { term: { 'attributes.name': ATTRIBUTES_NAME.GameMode } },
+              { terms: { 'attributes.value': params.gameModes } },
+            ],
+          },
+        },
+      },
     });
   }
 
   if (params.mangaStatuses?.length) {
     (esQuery as any).bool.filter.push({
-      terms: { 'attribute.name': ATTRIBUTES_NAME.Status },
-    });
-
-    (esQuery as any).bool.filter.push({
-      terms: { manga_status: params.mangaStatuses },
+      nested: {
+        path: 'attributes',
+        query: {
+          bool: {
+            filter: [
+              { term: { 'attributes.name': ATTRIBUTES_NAME.Status } },
+              { terms: { 'attributes.value': params.mangaStatuses } },
+            ],
+          },
+        },
+      },
     });
   }
 
   if (params.mangaGenres?.length) {
     (esQuery as any).bool.filter.push({
-      terms: { 'attribute.name': ATTRIBUTES_NAME.Genre },
-    });
-
-    (esQuery as any).bool.filter.push({
-      terms: { manga_genre: params.mangaGenres },
+      nested: {
+        path: 'attributes',
+        query: {
+          bool: {
+            filter: [
+              { term: { 'attributes.name': ATTRIBUTES_NAME.Genre } },
+              { terms: { 'attributes.value': params.mangaGenres } },
+            ],
+          },
+        },
+      },
     });
   }
 
   if (params.artGenres?.length) {
     (esQuery as any).bool.filter.push({
-      terms: { 'attribute.name': ATTRIBUTES_NAME.Genre },
-    });
-
-    (esQuery as any).bool.filter.push({
-      terms: { art_genre: params.artGenres },
+      nested: {
+        path: 'attributes',
+        query: {
+          bool: {
+            filter: [
+              { term: { 'attributes.name': ATTRIBUTES_NAME.Genre } },
+              { terms: { 'attributes.value': params.artGenres } },
+            ],
+          },
+        },
+      },
     });
   }
   console.log(`esQuery: ${JSON.stringify(esQuery)}`);
