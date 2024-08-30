@@ -25,7 +25,7 @@ export const uploadFileRoute: Hapi.ServerRoute = {
     // load the whole file to memory
     payload: {
       multipart: true,
-      maxBytes: 1048576,
+      maxBytes: 10485760,
       parse: true,
       output: 'stream',
     },
