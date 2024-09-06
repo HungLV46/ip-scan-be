@@ -1,6 +1,7 @@
 import { prisma } from '#common/db';
 import { elasticsearch } from '#common/elastic-search';
 import { getLastIndexedTime, setLastIndexedTime } from '#common/redis';
+import { ATTRIBUTES_NAME } from '#root/common/const';
 import {
   BuildProductDocumentData,
   ProductDocument,
@@ -260,3 +261,180 @@ export const syncDataMissing = async (): Promise<void> => {
     );
   }
 };
+
+export async function queryFilter(params: {
+  chainIds?: number[];
+  categories?: string[];
+  playerInfos?: string[];
+  gameStatuses?: string[];
+  gameGenres?: string[];
+  gameModes?: string[];
+  mangaStatuses?: string[];
+  mangaGenres?: string[];
+  artGenres?: string[];
+  limit?: number;
+}) {
+  let esQuery = undefined;
+
+  esQuery = {
+    bool: {
+      filter: [],
+    },
+  };
+
+  if (params.chainIds?.length) {
+    (esQuery as any).bool.filter.push({
+      nested: {
+        path: 'product_collections',
+        query: {
+          nested: {
+            path: 'product_collections.collection',
+            query: {
+              bool: {
+                filter: [
+                  {
+                    terms: {
+                      'product_collections.collection.chain_id':
+                        params.chainIds,
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  if (params.categories?.length) {
+    (esQuery as any).bool.filter.push({
+      terms: { category: params.categories },
+    });
+  }
+
+  if (params.playerInfos?.length) {
+    (esQuery as any).bool.filter.push({
+      nested: {
+        path: 'attributes',
+        query: {
+          bool: {
+            filter: [
+              { term: { 'attributes.name': ATTRIBUTES_NAME.PlayerInfo } },
+              { terms: { 'attributes.value': params.playerInfos } },
+            ],
+          },
+        },
+      },
+    });
+  }
+
+  if (params.gameStatuses?.length) {
+    (esQuery as any).bool.filter.push({
+      nested: {
+        path: 'attributes',
+        query: {
+          bool: {
+            filter: [
+              { term: { 'attributes.name': ATTRIBUTES_NAME.Status } },
+              { terms: { 'attributes.value': params.gameStatuses } },
+            ],
+          },
+        },
+      },
+    });
+  }
+
+  if (params.gameGenres?.length) {
+    (esQuery as any).bool.filter.push({
+      nested: {
+        path: 'attributes',
+        query: {
+          bool: {
+            filter: [
+              { term: { 'attributes.name': ATTRIBUTES_NAME.Genre } },
+              { terms: { 'attributes.value': params.gameGenres } },
+            ],
+          },
+        },
+      },
+    });
+  }
+
+  if (params.gameModes?.length) {
+    (esQuery as any).bool.filter.push({
+      nested: {
+        path: 'attributes',
+        query: {
+          bool: {
+            filter: [
+              { term: { 'attributes.name': ATTRIBUTES_NAME.GameMode } },
+              { terms: { 'attributes.value': params.gameModes } },
+            ],
+          },
+        },
+      },
+    });
+  }
+
+  if (params.mangaStatuses?.length) {
+    (esQuery as any).bool.filter.push({
+      nested: {
+        path: 'attributes',
+        query: {
+          bool: {
+            filter: [
+              { term: { 'attributes.name': ATTRIBUTES_NAME.Status } },
+              { terms: { 'attributes.value': params.mangaStatuses } },
+            ],
+          },
+        },
+      },
+    });
+  }
+
+  if (params.mangaGenres?.length) {
+    (esQuery as any).bool.filter.push({
+      nested: {
+        path: 'attributes',
+        query: {
+          bool: {
+            filter: [
+              { term: { 'attributes.name': ATTRIBUTES_NAME.Genre } },
+              { terms: { 'attributes.value': params.mangaGenres } },
+            ],
+          },
+        },
+      },
+    });
+  }
+
+  if (params.artGenres?.length) {
+    (esQuery as any).bool.filter.push({
+      nested: {
+        path: 'attributes',
+        query: {
+          bool: {
+            filter: [
+              { term: { 'attributes.name': ATTRIBUTES_NAME.Genre } },
+              { terms: { 'attributes.value': params.artGenres } },
+            ],
+          },
+        },
+      },
+    });
+  }
+  console.log(`esQuery: ${JSON.stringify(esQuery)}`);
+
+  const esSearchParams = {
+    index: INDEX_NAME,
+    query: esQuery,
+    size: params.limit || 10,
+  };
+
+  const esResult = await elasticsearch.search<ProductDocument>(esSearchParams);
+  const results = esResult.hits.hits.map((hit) => hit._source!);
+  const count = (esResult.hits.total as any).value || 0;
+
+  return { results, count };
+}

@@ -10,6 +10,21 @@ if (config.elasticsearchUrl) {
   });
 }
 
+export const filter = async (params: {
+  chainIds: number[];
+  categories?: string[];
+  playerInfos?: string[];
+  gameStatuses?: string[];
+  gameGenres?: string[];
+  gameModes?: string[];
+  mangaStatuses?: string[];
+  mangaGenres?: string[];
+  artGenres?: string[];
+  limit?: number;
+}) => {
+  return await productIndex.queryFilter(params);
+};
+
 export const queryProducts = async (params: any) => {
   return await productIndex.querySearch(params);
 };

@@ -7,7 +7,8 @@ export * from '#apis/routes/users/create';
 export * from '#apis/routes/users/update';
 export * from '#apis/routes/users/delete';
 
-// Search API
+// Search & Filter API
 export * from '#apis/routes/elastic-search/search';
+export * from '#apis/routes/elastic-search/filter';
 
 export * from '#apis/routes/utils/upload';
